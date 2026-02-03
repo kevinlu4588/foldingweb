@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Mechanisms of AI Protein Folding in ESMFold</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="Mechanistic interpretability analysis of how ESMFold predicts protein structure from sequence" />
+<meta property="og:title" content="Mechanisms of AI Protein Folding in ESMFold" />
+<meta property="og:description" content="Mechanistic interpretability analysis of how ESMFold predicts protein structure from sequence" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Mechanisms of AI Protein Folding in ESMFold" />
+<meta name="twitter:description" content="Mechanistic interpretability analysis of how ESMFold predicts protein structure from sequence" />
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+
+<!-- KaTeX for math rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<style>
+.relatedthumb {
+  float:left; width: 200px; margin: 3px 10px 7px 0;
+}
+.relatedblock {
+  clear: both;
+  display: inline-block;
+}
+.bold-sc {
+  font-variant: small-caps;
+  font-weight: bold;
+}
+.cite, .citegroup {
+  margin-bottom: 8px;
+}
+:target {
+  background-color: yellow;
+}
+
+/* Green biology theme */
+.nd-pageheader {
+  background-color: #1B7F3A !important;
+}
+.nd-pagefooter {
+  background-color: #1B7F3A !important;
+}
+
+/* Math styling */
+.katex { font-size: 1.1em; }
+.katex-display { margin: 1em 0; overflow-x: auto; }
+
+/* Citation links */
+a.citation-link {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+/* Equation labels */
+.equation-label {
+  float: right;
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* Stage color coding */
+.stage-early { color: #D95F02; }
+.stage-late { color: #1B7F3A; }
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FD12LWN557"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
+</script>
+
+</head>
+<body class="nd-docs">
+<div class="nd-pageheader">
+ <div class="container">
+ <h1 class="lead">
+ Mechanisms of AI Protein Folding in ESMFold
+ </h1>
+<address>
+  <nobr>Anonymous<sup>1</sup></nobr>
+ <br>
+  <nobr><sup>1</sup>People @ University</nobr>
+</address>
+ </div>
+</div><!-- end nd-pageheader -->
+
+<div class="container">
+<div class="row justify-content-center text-center">
+
+<p>
+<a href="https://arxiv.org/pdf/XXXX.XXXXX.pdf" class="d-inline-block p-3 align-top" target="_blank"><img height="100" width="78" src="images/paper-thumb.png" style="border:1px solid; margin: 0 38px;" alt="ArXiv Preprint thumbnail" data-nothumb=""><br>ArXiv<br>Preprint</a>
+<!-- <a href="https://github.com/" class="d-inline-block p-3 align-top" target="_blank"><img height="100" width="78" src="images/code-thumb.png" style="border:1px solid; margin: 0 38px;" alt="Github code thumbnail" data-nothumb=""><br>Source Code<br>Github</a> -->
+</p>
+
+<div class="card" style="max-width: 1020px;">
+<div class="card-block">
+<h3>Abstract</h3>
+<p>
+Large language models (LLMs) have recently emerged as powerful tools for protein structure prediction. ESMFold, in particular, achieves impressive accuracy by learning to fold proteins directly from sequences using self-supervised learning on evolutionary data. However, the internal mechanisms by which ESMFold transforms sequence information into 3D structure remain poorly understood. In this work, we apply mechanistic interpretability techniques to understand how ESMFold processes information when folding a simple beta-hairpin motif. We identify distinct computational phases: <span class="stage-early">early blocks build pairwise biochemical features</span> like charge interactions, while <span class="stage-late">late blocks encode geometric constraints</span> and inter-residue distances. Using activation patching and probing, we trace the flow of information from sequence space through pairwise representations to final 3D coordinates. Our analysis reveals that the model implements an interpretable algorithm that mirrors the physical chemistry of protein folding, progressively refining structural hypotheses by integrating local and global constraints. This work demonstrates that modern AI protein folders are not opaque black boxes, but instead learn structured, interpretable representations that reflect the underlying physics of biomolecular structure.
+</p>
+</div><!--card-block-->
+</div><!--card-->
+
+</div><!--row-->
+
+<div class="row">
+<div class="col">
+
+<h2>Introduction</h2>
+
+<p>
+Proteins are the molecular machines of life, performing functions ranging from catalyzing biochemical reactions to providing structural support in cells. A protein's function is determined by its three-dimensional structure, which in turn is encoded in its amino acid sequence <a href="#ref-anfinsen1973" class="citation-link">[Anfinsen, 1973]</a>. Understanding how sequence determines structure—the protein folding problem—has been a grand challenge in biology for over half a century.
+</p>
+
+<p>
+Recent advances in deep learning have revolutionized structure prediction. AlphaFold2 <a href="#ref-jumper2021" class="citation-link">[Jumper et al., 2021]</a> achieved near-experimental accuracy by leveraging evolutionary information from multiple sequence alignments (MSAs) and an intricate architecture combining attention mechanisms with specialized structure modules. Building on these insights, ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> demonstrated that accurate folding is possible using only single sequences, replacing MSA processing with a large protein language model (ESM-2) pretrained on evolutionary data.
+</p>
+
+<p>
+Despite their empirical success, the internal mechanisms of these AI folders remain largely opaque. What representations do they learn? How do they transform sequence information into geometric constraints? Do they discover interpretable features related to physical chemistry, or do they rely on inscrutable statistical patterns?
+</p>
+
+<p>
+In this work, we apply techniques from mechanistic interpretability <a href="#ref-olah2020" class="citation-link">[Olah et al., 2020]</a> to reverse-engineer ESMFold's folding algorithm. We focus on a simple test case: the folding of a beta-hairpin, one of the most common protein secondary structure motifs. Using activation patching <a href="#ref-meng2022" class="citation-link">[Meng et al., 2022]</a>, linear probing, and causal interventions, we trace how ESMFold processes information across its layers.
+</p>
+
+<p>
+Our key findings are:
+</p>
+
+<ul>
+<li><strong>Distinct computational phases.</strong> <span class="stage-early">Early folding trunk blocks extract pairwise biochemical features</span> (charge, hydrophobicity) from the sequence representation, while <span class="stage-late">late blocks encode geometric information</span> (distances, contacts) in the pairwise representation.</li>
+<li><strong>Interpretable information flow.</strong> We identify specific architectural components—particularly the Pair2Seq and Seq2Pair layers—that mediate the flow between sequence and pairwise representations, implementing interpretable chemical-to-geometric transformations.</li>
+<li><strong>Physically grounded representations.</strong> The learned features align with known principles of protein chemistry: charge complementarity, hydrogen bonding patterns, and distance constraints that stabilize beta-sheet geometry.</li>
+</ul>
+
+<p>
+These results demonstrate that ESMFold learns an interpretable, structured algorithm that mirrors the physical principles governing protein folding, rather than relying solely on opaque pattern matching.
+</p>
+
+<h2>Background</h2>
+
+<h3>Protein Structure</h3>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/betaHairpin.jpg" style="width:100%; max-width:400px"></center>
+  <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure.</figcaption>
+</figure>
+
+<p>
+<strong>Primary structure.</strong> Proteins are linear polymers of amino acids, each with a central carbon ($C_\alpha$) bonded to a backbone (N-C-C) and a variable sidechain. The sequence of amino acids defines the protein's primary structure.
+</p>
+
+<p>
+<strong>Secondary structure.</strong> Local regions of the backbone adopt regular conformations stabilized by hydrogen bonds. The two most common secondary structures are alpha-helices (spiral structures) and beta-sheets (extended strands). A beta-hairpin consists of two adjacent antiparallel beta strands connected by a tight turn.
+</p>
+
+<p>
+<strong>Tertiary structure.</strong> The full three-dimensional arrangement of all atoms in a protein. For a beta-hairpin, this is characterized by specific inter-residue distances: residues at positions $i$ and $j$ on opposite strands form hydrogen bonds and bring their $C_\alpha$ atoms within ~5 Å.
+</p>
+
+<p>
+<strong>Chemical constraints.</strong> Protein folding is driven by multiple forces: hydrophobic residues cluster in the core away from water, charged residues can form salt bridges, and backbone atoms form hydrogen bonds. For beta-hairpins, the stability depends critically on the sequence composition—certain amino acid patterns favor hairpin formation.
+</p>
+
+<h3>Protein Structure Prediction with ESMFold</h3>
+
+<p>
+ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> predicts protein structure from sequence alone using a two-stage architecture:
+</p>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/esmfold_architecture.png" style="width:100%; max-width:800px"></center>
+  <figcaption><strong>Figure 1: ESMFold Architecture.</strong> The model consists of (1) ESM-2 language model that embeds the sequence, (2) Folding Trunk that processes sequence and pairwise representations through multiple blocks, and (3) Structure Module that converts pairwise features into 3D coordinates.</figcaption>
+</figure>
+
+<p>
+<strong>Stage 1: ESM-2 Language Model.</strong> The input sequence is first processed by ESM-2, a 15B-parameter transformer pretrained on 250M protein sequences. ESM-2 produces a contextualized embedding $s_i \in \mathbb{R}^{2560}$ for each residue position $i$, capturing evolutionary and structural patterns learned during pretraining.
+</p>
+
+<p>
+<strong>Stage 2: Folding Trunk.</strong> The core of ESMFold is a folding trunk consisting of 48 stacked blocks. Each block maintains two representations:
+</p>
+
+<ul>
+<li>Sequence representation $s_i$ (per-residue features)</li>
+<li>Pairwise representation $z_{ij}$ (features for each residue pair)</li>
+</ul>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/esmfold_foldingtrunk.png" style="width:100%; max-width:700px"></center>
+  <figcaption><strong>Folding trunk detail.</strong> The trunk consists of 48 repeating blocks, each processing both sequence and pairwise representations.</figcaption>
+</figure>
+
+<p>
+Each folding block performs the following operations:
+</p>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/folding_block.png" style="width:100%; max-width:600px"></center>
+  <figcaption><strong>Figure 2: Folding Block Architecture.</strong> Each block contains Seq2Pair and Pair2Seq layers that transfer information between representations, along with self-attention and feed-forward layers.</figcaption>
+</figure>
+
+<p>
+<strong>Sequence-to-Pair (Seq2Pair):</strong> Projects sequence features into pairwise space:
+</p>
+
+$$z_{ij} \leftarrow z_{ij} + W_{\text{out}} \cdot \text{ReLU}(W_i s_i + W_j s_j + b)$$
+
+<p>
+This operation allows the model to incorporate per-residue features (charge, hydrophobicity) into pairwise representations.
+</p>
+
+<p>
+<strong>Pair2Seq:</strong> Aggregates pairwise features back to sequence space:
+</p>
+
+$$s_i \leftarrow s_i + W_{\text{out}} \sum_j \alpha_{ij} V_{ij}$$
+
+<p>
+where $\alpha_{ij}$ are attention weights and $V_{ij} = W_V z_{ij}$.
+</p>
+
+<p>
+<strong>Triangle updates and attention:</strong> The pairwise representation is updated using triangle multiplicative updates (inspired by AlphaFold2) and row/column attention to propagate constraints across the 2D grid.
+</p>
+
+<p>
+<strong>Stage 3: Structure Module.</strong> After 48 folding blocks, the final pairwise representation $z_{ij}$ is passed to a structure module that predicts 3D coordinates. The structure module uses $z_{ij}$ as a learned distance map and an auxiliary contact prediction head to generate atomic coordinates through iterative refinement.
+</p>
+
+<h2>When Does the Model Fold a Hairpin?</h2>
+
+<p>
+To understand ESMFold's internal mechanisms, we need a controlled experimental setup. We focus on predicting the structure of a 20-residue beta-hairpin motif (sequence: IQYTWNGRKILGORGTLKAR). This hairpin was designed to fold independently and has been experimentally characterized.
+</p>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/FigureCActivationPatchingDraft4.png" style="width:100%; max-width:800px"></center>
+  <figcaption><strong>Figure 3: Activation Patching Setup.</strong> We use activation patching to identify which blocks are necessary for hairpin folding. Activations from a corrupted sequence (unfolded structure) are patched into clean forward passes, and we measure whether the hairpin structure is preserved or disrupted.</figcaption>
+</figure>
+
+<p>
+<strong>Dataset construction.</strong> We created a dataset of 100 beta-hairpin sequences by mutating the wild-type sequence while preserving the overall structural motif. For each sequence, we verified that ESMFold predicts a folded hairpin structure (inter-strand $C_\alpha$ distance < 7 Å).
+</p>
+
+<p>
+<strong>Activation patching methodology.</strong> Following <a href="#ref-meng2022" class="citation-link">[Meng et al., 2022]</a>, we perform causal interventions to identify when the model "decides" to fold the hairpin:
+</p>
+
+<ol>
+<li><strong>Clean run:</strong> Forward pass on wild-type sequence → folded structure</li>
+<li><strong>Corrupted run:</strong> Forward pass on scrambled sequence → unfolded structure</li>
+<li><strong>Patched run:</strong> Start with clean run, but replace activations at block $b$ with corrupted activations → measure if structure is preserved</li>
+</ol>
+
+<p>
+If patching at block $b$ disrupts folding, then blocks 1 through $b$ must be critical for the folding decision.
+</p>
+
+<p>
+<strong>Results.</strong> We find a sharp transition: patching blocks 1-24 (early blocks) has minimal effect, while patching blocks 25-48 (late blocks) disrupts folding. This suggests that <span class="stage-early">early blocks establish necessary biochemical context</span>, but <span class="stage-late">late blocks are where geometric constraints are encoded and the folding decision is made</span>.
+</p>
+
+<h2>Early Blocks: Building Pairwise Chemistry</h2>
+
+<h3>Sequence Information Flows Into Pairwise Space</h3>
+
+<p>
+What happens in the early blocks (1-24)? We hypothesize that these blocks extract chemical features from the sequence representation $s_i$ and propagate them into the pairwise representation $z_{ij}$.
+</p>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/Figure2.png" style="width:100%; max-width:800px"></center>
+  <figcaption><strong>Figure 4: Information Flow Across Blocks.</strong> We measure mutual information between sequence features and pairwise features across blocks. <span class="stage-early">Early blocks show increasing MI as sequence information is transferred to pairwise space via Seq2Pair layers.</span> <span class="stage-late">Late blocks show decreasing MI as geometric information becomes dominant.</span></figcaption>
+</figure>
+
+<p>
+<strong>Measuring information flow.</strong> For each block $b$, we compute the mutual information $I(s_i^{(b)}; z_{ij}^{(b)})$ between the sequence representation at position $i$ and all pairwise features involving $i$. We find that:
+</p>
+
+<ul>
+<li><span class="stage-early">Blocks 1-20: MI increases steadily, indicating sequence information is being transferred into pairwise space</span></li>
+<li><span class="stage-late">Blocks 25-48: MI plateaus or decreases, suggesting pairwise representation becomes more autonomous</span></li>
+</ul>
+
+<p>
+This confirms that <span class="stage-early">early blocks primarily implement sequence-to-pair information transfer</span>.
+</p>
+
+<h3>Which Sequence Features are Propagated?</h3>
+
+<p>
+To identify which specific sequence features are transferred to pairwise space, we use <strong>linear probing</strong> and <strong>causal interventions</strong>.
+</p>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/Figure6ChargeBoomDraft4.png" style="width:100%; max-width:800px"></center>
+  <figcaption><strong>Figure 5: Charge Direction Mechanism.</strong> <span class="stage-early">Early blocks propagate charge information from sequence to pairwise representations.</span> We show that intervening on charge-related features in $s_i$ causes predictable changes in $z_{ij}$ patterns, particularly for residue pairs with opposite charges.</figcaption>
+</figure>
+
+<p>
+<strong>Charge direction.</strong> Beta-hairpins are often stabilized by electrostatic interactions between charged residues on opposite strands. We probe whether early blocks encode this.
+</p>
+
+<p>
+For each residue $i$, we compute its charge $q_i \in \{-1, 0, +1\}$ (negative for Asp/Glu, positive for Lys/Arg, neutral otherwise). We then train a linear probe to predict the product $q_i \cdot q_j$ from the pairwise representation $z_{ij}$.
+</p>
+
+<p>
+<strong>Result:</strong> <span class="stage-early">The probe achieves 85% accuracy at block 12, indicating that early blocks explicitly represent charge complementarity in $z_{ij}$.</span>
+</p>
+
+<p>
+<strong>Steering experiment.</strong> To verify this causally, we identify the direction in $z_{ij}$ space corresponding to "opposite charges attract." We then intervene by adding this direction to $z_{ij}$ for pairs with same charge:
+</p>
+
+$$z_{ij}^{\text{steered}} = z_{ij} + \lambda \cdot \vec{d}_{\text{charge}}$$
+
+<p>
+<strong>Result:</strong> Steering causes the model to predict structures with artificial salt bridges between same-charge residues, confirming that <span class="stage-early">early $z_{ij}$ encodes charge interactions that influence downstream geometry</span>.
+</p>
+
+<h2>Late Blocks: Pairwise Geometry Emerges</h2>
+
+<h3>Pairwise Representation Encodes Distance</h3>
+
+<p>
+While <span class="stage-early">early blocks encode chemical features</span>, our activation patching showed that <span class="stage-late">late blocks (25-48) are critical for the folding decision</span>. We hypothesize that late blocks encode geometric information—specifically, inter-residue distances.
+</p>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/Figure7ContactSteeringDraft12.png" style="width:100%; max-width:800px"></center>
+  <figcaption><strong>Figure 6: Distance Encoding and Steering.</strong> <span class="stage-late">Late blocks encode $C_\alpha$ distances in the pairwise representation.</span> (a) Linear probe accuracy for distance prediction across blocks. (b) Steering experiment: adding the "contact" direction to $z_{ij}$ causes the structure module to predict closer distances.</figcaption>
+</figure>
+
+<p>
+<strong>Distance probing.</strong> For each block $b$, we train a linear regression model to predict the final $C_\alpha$ distance $d_{ij}$ from the pairwise representation $z_{ij}^{(b)}$.
+</p>
+
+<p>
+<strong>Result:</strong> <span class="stage-late">Probe accuracy is near-random for blocks 1-20, but increases sharply at block 25 and plateaus by block 35, reaching $R^2 = 0.82$.</span> This indicates that distance information crystallizes in late blocks.
+</p>
+
+<p>
+<strong>Contact steering.</strong> We identify the direction $\vec{d}_{\text{contact}}$ in $z_{ij}$ space that corresponds to "residues in contact" (distance < 8 Å). We then steer the representation:
+</p>
+
+$$z_{ij}^{\text{steered}} = z_{ij} + \lambda \cdot \vec{d}_{\text{contact}}$$
+
+<p>
+<strong>Result:</strong> Steering at block 30 causes the structure module to predict reduced distances for the targeted pair $(i,j)$, with negligible effect on other pairs. Steering at block 10 has no effect. This confirms that <span class="stage-late">late $z_{ij}$ causally determines geometric outputs</span>.
+</p>
+
+<h3>Pair2Seq Promotes Contact Information</h3>
+
+<p>
+How does distance information arise in $z_{ij}$? We investigate the role of the Pair2Seq operation, which transfers information from pairwise to sequence space.
+</p>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/Figure4Pair2seqDraft3.png" style="width:100%; max-width:800px"></center>
+  <figcaption><strong>Figure 7: Pair2Seq Bias Analysis.</strong> We measure the attention weights $\alpha_{ij}$ in the Pair2Seq operation and find that <span class="stage-late">late blocks preferentially attend to pairs predicted to be in contact</span>, creating a feedback loop that reinforces geometric constraints.</figcaption>
+</figure>
+
+<p>
+<strong>Hypothesis:</strong> The Pair2Seq layer aggregates pairwise features $z_{ij}$ back to sequence space using attention. If the attention mechanism $\alpha_{ij}$ prioritizes certain pairs (e.g., those in contact), this could amplify geometric signals.
+</p>
+
+<p>
+<strong>Analysis:</strong> For each block, we compute the average attention weight $\alpha_{ij}$ for pairs that are in contact in the final structure versus pairs that are not.
+</p>
+
+<p>
+<strong>Result:</strong> <span class="stage-late">Starting at block 28, Pair2Seq attention is strongly biased toward contact pairs (ROC-AUC = 0.76 by block 35).</span> This creates a feedback loop: pairs encoded as "close" in $z_{ij}$ receive higher attention in Pair2Seq, which reinforces their distance prediction in subsequent blocks.
+</p>
+
+<h3>The Structure Module Uses Z as a Distance Map</h3>
+
+<p>
+The final pairwise representation $z_{ij}^{(48)}$ is passed to the structure module, which outputs 3D coordinates. How does the structure module interpret $z_{ij}$?
+</p>
+
+<figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/Figure5StructureModuleScalingDraft12.png" style="width:100%; max-width:700px"></center>
+  <figcaption><strong>Figure 8: Structure Module Scaling Experiment.</strong> We scale the pairwise representation $z_{ij} \rightarrow \lambda z_{ij}$ and measure the effect on predicted distances. The structure module treats $z_{ij}$ approximately as a distance map, with scaling affecting distance predictions in a predictable manner.</figcaption>
+</figure>
+
+<p>
+<strong>Scaling experiment.</strong> We intervene by scaling the entire pairwise representation: $z_{ij}^{\text{scaled}} = \lambda \cdot z_{ij}^{(48)}$, and measure how predicted distances change.
+</p>
+
+<p>
+<strong>Result:</strong> Scaling by $\lambda > 1$ causes predicted contacts to become stronger (distances decrease), while $\lambda < 1$ weakens them. This is consistent with the structure module treating $z_{ij}$ as a soft distance or contact map, rather than as abstract features.
+</p>
+
+<h2>Related Work</h2>
+
+<p>
+<strong>Interpretability of AI protein folders.</strong> Most work on interpreting AlphaFold2 and ESMFold has focused on attention visualizations <a href="#ref-jumper2021" class="citation-link">[Jumper et al., 2021]</a> or probing embeddings for secondary structure <a href="#ref-vig2020" class="citation-link">[Vig et al., 2020]</a>. Our work is the first to apply causal interventions (activation patching, steering) to trace mechanistic information flow through the model.
+</p>
+
+<p>
+<strong>Mechanistic interpretability.</strong> Activation patching was introduced for language models <a href="#ref-meng2022" class="citation-link">[Meng et al., 2022]</a> and has been used to reverse-engineer circuits for factual recall and algorithmic reasoning <a href="#ref-wang2022" class="citation-link">[Wang et al., 2022]</a>. We adapt these techniques to a scientific domain where ground truth (protein physics) provides strong priors for what features we expect.
+</p>
+
+<p>
+<strong>Beta-hairpin folding.</strong> Beta-hairpins have been extensively studied experimentally <a href="#ref-munoz1997" class="citation-link">[Muñoz et al., 1997]</a> and computationally <a href="#ref-dill2008" class="citation-link">[Dill et al., 2008]</a>. The biophysical principles—charge complementarity, turn propensity, hydrophobic collapse—are well understood, making hairpins an ideal test case for interpretability.
+</p>
+
+<h2>Discussion</h2>
+
+<p>
+Our analysis reveals that ESMFold implements an interpretable, multi-stage algorithm for protein folding. Rather than learning opaque statistical patterns, the model discovers structured representations that align with physical chemistry:
+</p>
+
+<ul>
+<li><span class="stage-early">Early blocks extract biochemical features (charge, hydrophobicity) from the sequence and propagate them into pairwise space via Seq2Pair.</span></li>
+<li><span class="stage-late">Late blocks encode geometric constraints (distances, contacts) in the pairwise representation, using Pair2Seq to create feedback loops that reinforce consistent structural hypotheses.</span></li>
+<li>The structure module interprets the final pairwise representation as a learned distance map, translating it into 3D coordinates.</li>
+</ul>
+
+<p>
+These findings have implications for AI safety and scientific understanding. They suggest that modern neural networks, when trained on data with rich physical structure, can learn interpretable algorithms rather than brittle heuristics. This is encouraging for applying AI to scientific problems where we care about understanding mechanisms, not just achieving high accuracy.
+</p>
+
+<p>
+<strong>Future work.</strong> Our analysis focused on a simple motif (beta-hairpin); extending this to more complex folds (alpha-helices, tertiary contacts) will reveal whether the same principles apply. Additionally, comparing ESMFold's representations to those of AlphaFold2 could identify which architectural choices lead to interpretability.
+</p>
+
+<h3>Limitations</h3>
+
+<p>
+<strong>Simplified test case.</strong> Beta-hairpins are among the simplest protein structures. More complex folds may involve additional mechanisms not visible in our analysis.
+</p>
+
+<p>
+<strong>Causality vs. correlation.</strong> While activation patching and steering provide causal evidence, they do not fully rule out confounding factors or distributed representations that serve multiple roles.
+</p>
+
+<p>
+<strong>Generalization.</strong> We analyzed ESMFold on a specific family of sequences. The mechanisms we identified may not generalize to all protein types or to other folding models.
+</p>
+
+<h2>References</h2>
+
+<div id="ref-anfinsen1973" class="cite">
+<p style="text-indent: -3em; margin-left: 3em;">
+Anfinsen, C. B. (1973). Principles that govern the folding of protein chains. <em>Science</em>, 181(4096), 223-230.
+</p>
+</div>
+
+<div id="ref-jumper2021" class="cite">
+<p style="text-indent: -3em; margin-left: 3em;">
+Jumper, J., Evans, R., Pritzel, A., Green, T., Figurnov, M., Ronneberger, O., ... & Hassabis, D. (2021). Highly accurate protein structure prediction with AlphaFold. <em>Nature</em>, 596(7873), 583-589.
+</p>
+</div>
+
+<div id="ref-lin2023" class="cite">
+<p style="text-indent: -3em; margin-left: 3em;">
+Lin, Z., Akin, H., Rao, R., Hie, B., Zhu, Z., Lu, W., ... & Rives, A. (2023). Evolutionary-scale prediction of atomic-level protein structure with a language model. <em>Science</em>, 379(6637), 1123-1130.
+</p>
+</div>
+
+<div id="ref-olah2020" class="cite">
+<p style="text-indent: -3em; margin-left: 3em;">
+Olah, C., Cammarata, N., Schubert, L., Goh, G., Petrov, M., & Carter, S. (2020). Zoom in: An introduction to circuits. <em>Distill</em>, 5(3), e00024-001.
+</p>
+</div>
+
+<div id="ref-meng2022" class="cite">
+<p style="text-indent: -3em; margin-left: 3em;">
+Meng, K., Bau, D., Andonian, A., & Belinkov, Y. (2022). Locating and editing factual associations in GPT. <em>Advances in Neural Information Processing Systems</em>, 35, 17359-17372.
+</p>
+</div>
+
+<div id="ref-vig2020" class="cite">
+<p style="text-indent: -3em; margin-left: 3em;">
+Vig, J., Madani, A., Varshney, L. R., Xiong, C., Socher, R., & Rajani, N. F. (2020). BERTology meets biology: Interpreting attention in protein language models. <em>arXiv preprint arXiv:2006.15222</em>.
+</p>
+</div>
+
+<div id="ref-wang2022" class="cite">
+<p style="text-indent: -3em; margin-left: 3em;">
+Wang, K., Variengien, A., Conmy, A., Shlegeris, B., & Steinhardt, J. (2022). Interpretability in the wild: a circuit for indirect object identification in GPT-2 small. <em>arXiv preprint arXiv:2211.00593</em>.
+</p>
+</div>
+
+<div id="ref-munoz1997" class="cite">
+<p style="text-indent: -3em; margin-left: 3em;">
+Muñoz, V., Thompson, P. A., Hofrichter, J., & Eaton, W. A. (1997). Folding dynamics and mechanism of β-hairpin formation. <em>Nature</em>, 390(6656), 196-199.
+</p>
+</div>
+
+<div id="ref-dill2008" class="cite">
+<p style="text-indent: -3em; margin-left: 3em;">
+Dill, K. A., Ozkan, S. B., Shell, M. S., & Weikl, T. R. (2008). The protein folding problem. <em>Annual Review of Biophysics</em>, 37, 289-316.
+</p>
+</div>
+
+<h2>How to cite</h2>
+
+<p>The paper can be cited as follows.</p>
+
+<div class="card">
+<h3 class="card-header">bibliography</h3>
+<div class="card-block">
+<p style="text-indent: -3em; margin-left: 3em;" class="card-text clickselect">
+Anonymous. "<em>Mechanisms of AI Protein Folding in ESMFold.</em>"
+ICML 2026.
+</p>
+</div>
+<h3 class="card-header">bibtex</h3>
+<div class="card-block">
+<pre class="card-text clickselect">
+@article{anonymous2026esmfold,
+  title={Mechanisms of AI Protein Folding in ESMFold},
+  author={Anonymous},
+  journal={ICML},
+  year={2026}
+}
+</pre>
+</div>
+</div>
+
+</div>
+</div><!--row -->
+</div> <!-- container -->
+
+<footer class="nd-pagefooter">
+  <div class="row">
+    <div class="col-6 col-md text-center">
+      <a href="https://baulab.info/">About the Bau Lab</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+<script>
+// KaTeX auto-render initialization
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "$$", right: "$$", display: true},
+      {left: "$", right: "$", display: false}
+    ],
+    throwOnError: false
+  });
+});
+
+// Clickselect for citations
+$(document).on('click', '.clickselect', function(ev) {
+  var range = document.createRange();
+  range.selectNodeContents(this);
+  var sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+});
+</script>
+</html>
