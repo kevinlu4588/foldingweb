@@ -100,9 +100,19 @@ gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
  Mechanisms of AI Protein Folding in ESMFold
  </h1>
 <address>
-  <nobr>Anonymous<sup>1</sup></nobr>
+  <nobr>Kevin Lu<sup>1</sup>,</nobr>
+  <nobr>Jannik Brinkmann<sup>1,2</sup>,</nobr>
+  <nobr>Stefan Huber<sup>3</sup>,</nobr>
+  <nobr>Aaron Mueller<sup>4</sup>,</nobr>
+  <nobr>Yonatan Belinkov<sup>5</sup>,</nobr>
+  <nobr>David Bau<sup>1</sup>,</nobr>
+  <nobr>Chris Wendler<sup>1</sup></nobr>
  <br>
-  <nobr><sup>1</sup>People @ University</nobr>
+  <nobr><sup>1</sup>Northeastern University,</nobr>
+  <nobr><sup>2</sup>TU Clausthal,</nobr>
+  <nobr><sup>3</sup>Harvard University,</nobr>
+  <nobr><sup>4</sup>Boston University,</nobr>
+  <nobr><sup>5</sup>Technion</nobr>
 </address>
  </div> 
 </div><!-- end nd-pageheader -->
@@ -343,7 +353,7 @@ How does distance information in $z$ influence the rest of the computation? The 
   </figure>
 
 <p>
-<strong>Bias encodes contacts.</strong> In middle and late blocks, the pair2seq bias cleanly separates contacting residue pairs (C$_\alpha$ distance &lt; 8&Aring;) from non-contacts. <span class="stage-late">Residue pairs in contact receive substantially more positive bias than non-contacts</span>, encouraging the sequence attention to preferentially mix information between contacting residues.
+<strong>Bias encodes contacts.</strong> In middle and late blocks, the pair2seq bias cleanly separates contacting residue pairs (C$_\alpha$ distance &lt; 8&Aring;) from non-contacts. <span class="stage-late">Residue pairs in contact receive substantially more positive bias than non-contacts</span>, encouraging the sequence attention to preferentially mix information between contacting residues. We visualize the bias values across blocks in the <a href="#appendix-bias-maps">Appendix</a>, along with per-head biases which show distinct patterns and suggest head specialization as an area for future investigation.
 </p>
 
 <p>
@@ -368,6 +378,56 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 <p>
 <strong>Result:</strong> <span class="stage-late">Scaling $z$ monotonically scales the mean pairwise distance between residues in the output structure.</span> Scaling up causes the protein to expand; scaling down causes it to contract. In contrast, scaling $s$ has virtually no effect on output geometry. Together with our steering experiments, this confirms that $z$ acts as a geometric blueprint that the structure module renders into 3D coordinates.
 </p>
+
+<h2 id="appendix-bias-maps">Appendix: Bias Maps</h2>
+
+<p>
+We visualize the pair2seq attention bias across blocks and across individual attention heads. For a single protein (PDB: 6rwc), we extract the bias term $\beta_{ij}(z_{ij})$ and average over heads. Green contours indicate structural contacts (C$_\alpha$ distance &lt; 8&Aring;).
+</p>
+
+<h3>Bias Across Blocks (Head-Averaged)</h3>
+
+<p>
+Each panel shows the bias term $\beta_{ij}$, averaged across all 8 attention heads, for protein 6rwc at selected blocks of the folding trunk. Red indicates positive bias (encouraging attention); blue indicates negative bias. In early blocks, the bias is near-uniform; by the middle blocks, it begins to align with the contact map, and by late blocks, contacting residue pairs receive substantially higher bias than non-contacts.
+</p>
+
+<div class="row">
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block00_avg.png" style="width:100%"><p class="text-center"><small>Block 0</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block04_avg.png" style="width:100%"><p class="text-center"><small>Block 4</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block08_avg.png" style="width:100%"><p class="text-center"><small>Block 8</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block12_avg.png" style="width:100%"><p class="text-center"><small>Block 12</small></p></div>
+</div>
+<div class="row">
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block16_avg.png" style="width:100%"><p class="text-center"><small>Block 16</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block20_avg.png" style="width:100%"><p class="text-center"><small>Block 20</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block24_avg.png" style="width:100%"><p class="text-center"><small>Block 24</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block28_avg.png" style="width:100%"><p class="text-center"><small>Block 28</small></p></div>
+</div>
+<div class="row">
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block32_avg.png" style="width:100%"><p class="text-center"><small>Block 32</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block36_avg.png" style="width:100%"><p class="text-center"><small>Block 36</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block40_avg.png" style="width:100%"><p class="text-center"><small>Block 40</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block44_avg.png" style="width:100%"><p class="text-center"><small>Block 44</small></p></div>
+</div>
+
+<h3>Per-Head Bias at Block 32</h3>
+
+<p>
+Individual attention head bias values for protein 6rwc at block 32. Different heads exhibit distinct patterns: some heads show strong contact-aligned bias, while others capture different spatial relationships or show more diffuse patterns. This specialization suggests that individual heads attend to complementary aspects of pairwise geometry.
+</p>
+
+<div class="row">
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block32_head0.png" style="width:100%"><p class="text-center"><small>Head 0</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block32_head1.png" style="width:100%"><p class="text-center"><small>Head 1</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block32_head2.png" style="width:100%"><p class="text-center"><small>Head 2</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block32_head3.png" style="width:100%"><p class="text-center"><small>Head 3</small></p></div>
+</div>
+<div class="row" style="margin-bottom: 30px;">
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block32_head4.png" style="width:100%"><p class="text-center"><small>Head 4</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block32_head5.png" style="width:100%"><p class="text-center"><small>Head 5</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block32_head6.png" style="width:100%"><p class="text-center"><small>Head 6</small></p></div>
+  <div class="col-md-3 col-sm-6"><img src="images/paper/bias_maps/6rwc_block32_head7.png" style="width:100%"><p class="text-center"><small>Head 7</small></p></div>
+</div>
 
 <h2>References</h2>
 
@@ -433,17 +493,16 @@ Dill, K. A., Ozkan, S. B., Shell, M. S., & Weikl, T. R. (2008). The protein fold
 <h3 class="card-header">bibliography</h3>
 <div class="card-block">
 <p style="text-indent: -3em; margin-left: 3em;" class="card-text clickselect">
-Anonymous. "<em>Mechanisms of AI Protein Folding in ESMFold.</em>"
-ICML 2026.
+Lu, K., Brinkmann, J., Huber, S., Mueller, A., Belinkov, Y., Bau, D., &amp; Wendler, C. (2026). Mechanisms of AI Protein Folding in ESMFold. <em>arXiv preprint arXiv:xxxx.xxxxx</em>.
 </p>
 </div>
 <h3 class="card-header">bibtex</h3>
 <div class="card-block">
 <pre class="card-text clickselect">
-@article{anonymous2026esmfold,
+@article{lu2026mechanisms,
   title={Mechanisms of AI Protein Folding in ESMFold},
-  author={Anonymous},
-  journal={ICML},
+  author={Lu, Kevin and Brinkmann, Jannik and Huber, Stefan and Mueller, Aaron and Belinkov, Yonatan and Bau, David and Wendler, Chris},
+  journal={arXiv preprint arXiv:xxxx.xxxxx},
   year={2026}
 }
 </pre>
