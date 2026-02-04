@@ -110,7 +110,7 @@ gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
 <div class="card-block">
 <h3>Abstract</h3>
 <p>
-Large language models (LLMs) have recently emerged as powerful tools for protein structure prediction. ESMFold, in particular, achieves impressive accuracy by learning to fold proteins directly from sequences using self-supervised learning on evolutionary data. However, the internal mechanisms by which ESMFold transforms sequence information into 3D structure remain poorly understood. In this work, we apply mechanistic interpretability techniques to understand how ESMFold processes information when folding a simple beta-hairpin motif. We identify distinct computational phases: <span class="stage-early">early blocks build pairwise biochemical features</span> like charge interactions, while <span class="stage-late">late blocks encode geometric constraints</span> and inter-residue distances. Using activation patching and probing, we trace the flow of information from sequence space through pairwise representations to final 3D coordinates. Our analysis reveals that the model implements an interpretable algorithm that mirrors the physical chemistry of protein folding, progressively refining structural hypotheses by integrating local and global constraints. This work demonstrates that modern AI protein folders are not opaque black boxes, but instead learn structured, interpretable representations that reflect the underlying physics of biomolecular structure.
+How do protein structure prediction models fold proteins? We investigate this question by tracing how ESMFold folds a beta hairpin, a prevalent structural motif. Through counterfactual interventions on model latents, we identify two computational stages in the folding trunk. In the first stage, early blocks initialize \textit{pairwise biochemical signals}: residue identities and associated biochemical features like charge flow from sequence representations into pairwise representations. In the second stage, late blocks develop \textit{pairwise spatial features}: distance and contact information accumulate in the pairwise representation. We demonstrate that the mechanisms underlying structural decisions of ESMFold can be localized, traced through interpretable representations, and manipulated with strong causal effects.
 </p>
 </div><!--card-block-->
 </div><!--card-->
@@ -123,56 +123,29 @@ Large language models (LLMs) have recently emerged as powerful tools for protein
 <h2>Introduction</h2>
 
 <p>
-How do protein folding models fold proteins? By predicting three-dimensional structures directly from amino acid sequences, neural networks such as AlphaFold <a href="#ref-jumper2021" class="citation-link">[Jumper et al., 2021]</a> and ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> often eliminate the need for labor-intensive crystallography and cryo-EM experiments, substantially accelerating downstream analysis and protein discovery. Their empirical success raises mechanistic questions about <em>AI protein folding</em>: how do these models compute a fold from a sequence, and when are structural decisions made during inference?
-</p>
+How do protein folding models fold proteins? We study these questions in ESMFold. Like AlphaFold2, OpenFold, and Boltz-2, ESMFold is built around a \textit{folding trunk}, the architectural component in which sequence becomes structure. The trunk iteratively refines a sequence representation while building a pairwise representation that encodes relationships between residues; a structure module then decodes these into 3D coordinates. Mechanistically understanding these learned computations could inform how we interact with, diagnose, and build on this entire class of models.
 
-<p>
-We study these questions in ESMFold. Like AlphaFold2, OpenFold, and Boltz-2, ESMFold is built around a <em>folding trunk</em>, the architectural component in which sequence becomes structure. The trunk iteratively refines a sequence representation while building a pairwise representation that encodes relationships between residues; a structure module then decodes these into 3D coordinates. Mechanistically understanding these learned computations could inform how we interact with, diagnose, and build on this entire class of models.
-</p>
+In this work, we conduct the first mechanistic analysis fo a protein model folding trunk and focus on how it folds a simple and prevalent structural motif: the beta hairpin (Munoz et al, 1998; Blanco et al., 1998). 
 
-<p>
-In this work, we conduct the first mechanistic analysis of a protein model folding trunk via the example of ESMFold. We focus on how it folds a simple and prevalent structural motif: the beta hairpin <a href="#ref-munoz1997" class="citation-link">[Muñoz et al., 1997]</a>. A beta hairpin consists of two short strands connected by a short turn, and is among the simplest motifs that still requires coordination between sequence-distant residues, making it a natural test case for studying the folding process.
-</p>
+We use activation patching of sequence and pairwise representations from the forward pass of a donor protein containing a beta hairpin into the forward pass of a donor protein, and find that ESMFold folds a hairpin in two computational stages (Figure 1). 
 
-<p>
-We use activation patching <a href="#ref-meng2022" class="citation-link">[Meng et al., 2022]</a> to transplant sequence and pairwise representations from the forward pass of a donor protein containing a beta hairpin into the forward pass of a target protein containing an alpha-helical region. By observing whether the patched folding trunk produces a hairpin in the target region, and by varying both <em>what</em> is patched (sequence versus pairwise representations) and <em>where</em> it is patched (early versus late blocks), we can localize and characterize the computations that drive beta hairpin formation.
+In the first stage, early blocks initialize pairwise biochemical signals: residue identities and associated biochemical features like charge flow from sequence representations into pairwise representations. In the second stage, late blocks develop pairwise spatial features: distance and contact information accumulate in the pairwise representation.
 </p>
-
-<p>
-Building on this setup, we find that ESMFold folds a hairpin in two computational stages. In the first stage, <span class="stage-early">early blocks of the folding trunk initialize pairwise biochemical signals</span>: residue identity and interaction-relevant features, such as charge, are propagated from the sequence representation into the pairwise representation. These early pairwise signals enable communication between potentially interacting residues without yet encoding much explicit spatial structure. In the second stage, <span class="stage-late">late blocks develop pairwise spatial features</span>: the model uses accumulated biochemical information to develop distance information and contact-related structure in the pairwise representation, which modulates the sequence attention and directly controls the predicted coordinates.
-</p>
-
-<p>
-<strong>Contributions.</strong> Our contributions are fourfold: (1) We demonstrate that activation patching can induce concrete and localized structural changes in predicted protein structures, establishing it as a practical tool for mechanistic analysis of folding models. (2) We identify distinct computational stages within the folding trunk of ESMFold and assign them human-interpretable functional roles. (3) We demonstrate that molecular features such as charge are encoded in interpretable directions in latent space and causally influence folding: steering charge-related components in early blocks can induce hairpin formation. (4) We characterize how the pairwise representation functions as a distance map to control output protein geometry.
-</p>
-
-<p>
-Together, these results lay the foundation for interpretability in protein folding models, demonstrating that internal trunk representations admit localized, causal, and mechanistically meaningful interventions.
-</p>
-
 <h2>Background</h2>
 
 <h3>Protein Structure</h3>
 
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/betaHairpin.jpg" style="width:100%; max-width:400px"></center>
-  <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure.</figcaption>
+  <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure, and Calpha-Calpha distances are commonly used to measure iter-residue distances.</figcaption>
   </figure>
 
 <p>
-<strong>Primary structure.</strong> Proteins are linear polymers of amino acids, each with a central carbon ($C_\alpha$) bonded to a backbone (N-C-C) and a variable sidechain. The sequence of amino acids defines the protein's primary structure.
+<strong>Chains fo amino acids.</strong> Proteins are linear polymers of amino acids, each with a central carbon ($C_\alpha$) bonded to a backbone (N-C-C) and a variable sidechain. The sequence of amino acids defines the protein's primary structure.
 </p>
 
 <p>
 <strong>Secondary structure.</strong> Local regions of the backbone adopt regular conformations stabilized by hydrogen bonds. The two most common secondary structures are alpha-helices (spiral structures) and beta-sheets (extended strands). A beta-hairpin consists of two adjacent antiparallel beta strands connected by a tight turn.
-</p>
-
-<p>
-<strong>Tertiary structure.</strong> The full three-dimensional arrangement of all atoms in a protein. For a beta-hairpin, this is characterized by specific inter-residue distances: residues at positions $i$ and $j$ on opposite strands form hydrogen bonds and bring their $C_\alpha$ atoms within ~5 Å.
-</p>
-
-<p>
-<strong>Chemical constraints.</strong> Protein folding is driven by multiple forces: hydrophobic residues cluster in the core away from water, charged residues can form salt bridges, and backbone atoms form hydrogen bonds. For beta-hairpins, the stability depends critically on the sequence composition—certain amino acid patterns favor hairpin formation.
 </p>
 
 <h3>Protein Structure Prediction with ESMFold</h3>
@@ -187,11 +160,11 @@ ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> pred
   </figure>
 
 <p>
-<strong>Stage 1: ESM-2 Language Model.</strong> The input sequence is first processed by ESM-2, a 15B-parameter transformer pretrained on 250M protein sequences. ESM-2 produces a contextualized embedding $s_i \in \mathbb{R}^{2560}$ for each residue position $i$, capturing evolutionary and structural patterns learned during pretraining.
+<strong>Moduel 1: ESM-2 Language Model.</strong> The input sequence is first processed by ESM-2, a 3B-parameter transformer pretrained on 250M protein sequences. ESM-2 produces a contextualized embedding $s_i \in \mathbb{R}^{2560}$ for each residue position $i$, capturing evolutionary and structural patterns learned during pretraining.
 </p>
 
 <p>
-<strong>Stage 2: Folding Trunk.</strong> The core of ESMFold is a folding trunk consisting of 48 stacked blocks. Each block maintains two representations:
+<strong>Module 2: Folding Trunk.</strong> The core of ESMFold is a folding trunk consisting of 48 stacked blocks. Each block maintains two representations:
 </p>
 
 <ul>
@@ -199,18 +172,15 @@ ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> pred
 <li>Pairwise representation $z_{ij}$ (features for each residue pair)</li>
 </ul>
 
-  <figure class="center_image" style="margin-top: 30px">
-  <center><img src="images/paper/esmfold_foldingtrunk.png" style="width:100%; max-width:700px"></center>
-  <figcaption><strong>Folding trunk detail.</strong> The trunk consists of 48 repeating blocks, each processing both sequence and pairwise representations.</figcaption>
-  </figure>
+
 
 <p>
 Each folding block performs the following operations:
 </p>
 
   <figure class="center_image" style="margin-top: 30px">
-  <center><img src="images/paper/folding_block.png" style="width:100%; max-width:600px"></center>
-  <figcaption><strong>Figure 2: Folding Block Architecture.</strong> Each block contains Seq2Pair and Pair2Seq layers that transfer information between representations, along with self-attention and feed-forward layers.</figcaption>
+  <center><img src="images/paper/esmfold_foldingtrunk.png" style="width:100%; max-width:700px"></center>
+  <figcaption><strong>Folding trunk detail.</strong> The trunk consists of 48 repeating blocks, each processing both sequence and pairwise representations.</figcaption>
   </figure>
 
 <p>
@@ -220,7 +190,6 @@ Each folding block performs the following operations:
 $$z_{ij} \leftarrow z_{ij} + W_{\text{out}} \cdot \text{ReLU}(W_i s_i + W_j s_j + b)$$
 
 <p>
-This operation allows the model to incorporate per-residue features (charge, hydrophobicity) into pairwise representations.
 </p>
 
 <p>
@@ -238,7 +207,7 @@ where $\alpha_{ij}$ are attention weights and $V_{ij} = W_V z_{ij}$.
 </p>
 
 <p>
-<strong>Stage 3: Structure Module.</strong> After 48 folding blocks, the final pairwise representation $z_{ij}$ is passed to a structure module that predicts 3D coordinates. The structure module uses $z_{ij}$ as a learned distance map and an auxiliary contact prediction head to generate atomic coordinates through iterative refinement.
+<strong>Stage 3: Structure Module.</strong> After 48 folding blocks, the final pairwise representation $z_{ij}$ is passed to a structure module that predicts 3D coordinates.
 </p>
 
 <h2>When Does the Model Fold a Hairpin?</h2>
