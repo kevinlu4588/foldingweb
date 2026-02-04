@@ -140,10 +140,7 @@ gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
 How do protein structure prediction models fold proteins? We investigate this question by tracing how ESMFold folds a beta hairpin, a prevalent structural motif. Through counterfactual interventions on model latents, we identify two computational stages in the folding trunk. In the first stage, early blocks initialize <em class="stage-early">pairwise biochemical signals</em>: residue identities and associated biochemical features like charge flow from sequence representations into pairwise representations. In the second stage, late blocks develop <em class="stage-late">pairwise spatial features</em>: distance and contact information accumulate in the pairwise representation. We demonstrate that the mechanisms underlying structural decisions of ESMFold can be localized, traced through interpretable representations, and manipulated with strong causal effects.
 </p>
 
-  <figure class="center_image" style="margin-top: 30px">
-  <center><img src="images/paper/Figure1.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 1: Two computational stages in the ESMFold folding trunk.</strong> We identify which latent representations in the model influence hairpin formation by patching activations from a hairpin protein into a helical protein at each block of the trunk, then measuring whether the output folds as a hairpin. <span class="stage-early">Sequence patches (orange)</span> induce hairpin formation in early blocks (0&ndash;7); <span class="stage-late">pairwise patches (green)</span> are effective in late blocks, with results aggregated over 2000 experiments. We show that stage 1 propagates biochemical features (e.g., charge) from sequence into pairwise representations, while stage 2 develops pairwise spatial features (distances, contacts) that modulate sequence attention and control output geometry.</figcaption>
-  </figure>
+
 
 </div><!--card-block-->
 </div><!--card-->
@@ -152,7 +149,12 @@ How do protein structure prediction models fold proteins? We investigate this qu
   
 <div class="row">
 <div class="col">
-  
+
+    <figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/Figure1.png" style="width:100%; max-width:800px"></center>
+  <figcaption><strong>Figure 1: Two computational stages in the ESMFold folding trunk.</strong> We identify which latent representations in the model influence hairpin formation by patching activations from a hairpin protein into a helical protein at each block of the trunk, then measuring whether the output folds as a hairpin. <span class="stage-early">Sequence patches (orange)</span> induce hairpin formation in early blocks (0&ndash;7); <span class="stage-late">pairwise patches (green)</span> are effective in late blocks, with results aggregated over 2000 experiments. We show that stage 1 propagates biochemical features (e.g., charge) from sequence into pairwise representations, while stage 2 develops pairwise spatial features (distances, contacts) that modulate sequence attention and control output geometry.</figcaption>
+  </figure>
+
 <h2>Introduction</h2>
 
 <p>
