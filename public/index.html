@@ -110,7 +110,7 @@ gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
 <div class="card-block">
 <h3>Abstract</h3>
 <p>
-How do protein structure prediction models fold proteins? We investigate this question by tracing how ESMFold folds a beta hairpin, a prevalent structural motif. Through counterfactual interventions on model latents, we identify two computational stages in the folding trunk. In the first stage, early blocks initialize \textit{pairwise biochemical signals}: residue identities and associated biochemical features like charge flow from sequence representations into pairwise representations. In the second stage, late blocks develop \textit{pairwise spatial features}: distance and contact information accumulate in the pairwise representation. We demonstrate that the mechanisms underlying structural decisions of ESMFold can be localized, traced through interpretable representations, and manipulated with strong causal effects.
+How do protein structure prediction models fold proteins? We investigate this question by tracing how ESMFold folds a beta hairpin, a prevalent structural motif. Through counterfactual interventions on model latents, we identify two computational stages in the folding trunk. In the first stage, early blocks initialize <em>pairwise biochemical signals</em>: residue identities and associated biochemical features like charge flow from sequence representations into pairwise representations. In the second stage, late blocks develop <em>pairwise spatial features</em>: distance and contact information accumulate in the pairwise representation. We demonstrate that the mechanisms underlying structural decisions of ESMFold can be localized, traced through interpretable representations, and manipulated with strong causal effects.
 </p>
 </div><!--card-block-->
 </div><!--card-->
@@ -123,12 +123,14 @@ How do protein structure prediction models fold proteins? We investigate this qu
 <h2>Introduction</h2>
 
 <p>
-How do protein folding models fold proteins? We study these questions in ESMFold. Like AlphaFold2, OpenFold, and Boltz-2, ESMFold is built around a \textit{folding trunk}, the architectural component in which sequence becomes structure. The trunk iteratively refines a sequence representation while building a pairwise representation that encodes relationships between residues; a structure module then decodes these into 3D coordinates. Mechanistically understanding these learned computations could inform how we interact with, diagnose, and build on this entire class of models.
+How do protein folding models fold proteins? We study these questions in ESMFold. Like AlphaFold2, OpenFold, and Boltz-2, ESMFold is built around a <em>folding trunk</em>, the architectural component in which sequence becomes structure. The trunk iteratively refines a sequence representation while building a pairwise representation that encodes relationships between residues; a structure module then decodes these into 3D coordinates. Mechanistically understanding these learned computations could inform how we interact with, diagnose, and build on this entire class of models.
+</p>
 
-In this work, we conduct the first mechanistic analysis fo a protein model folding trunk and focus on how it folds a simple and prevalent structural motif: the beta hairpin (Munoz et al, 1998; Blanco et al., 1998). 
+<p>
+In this work, we conduct the first mechanistic analysis of a protein model folding trunk and focus on how it folds a simple and prevalent structural motif: the beta hairpin. We use activation patching to transplant sequence and pairwise representations from a donor protein containing a beta hairpin into a target protein containing an alpha-helical region. By observing whether the patched trunk produces a hairpin in the target region, we find that ESMFold folds a hairpin in two computational stages.
+</p>
 
-We use activation patching of sequence and pairwise representations from the forward pass of a donor protein containing a beta hairpin into the forward pass of a donor protein, and find that ESMFold folds a hairpin in two computational stages (Figure 1). 
-
+<p>
 In the first stage, early blocks initialize pairwise biochemical signals: residue identities and associated biochemical features like charge flow from sequence representations into pairwise representations. In the second stage, late blocks develop pairwise spatial features: distance and contact information accumulate in the pairwise representation.
 </p>
 <h2>Background</h2>
@@ -137,11 +139,11 @@ In the first stage, early blocks initialize pairwise biochemical signals: residu
 
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/betaHairpin.jpg" style="width:100%; max-width:400px"></center>
-  <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure, and Calpha-Calpha distances are commonly used to measure iter-residue distances.</figcaption>
+  <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure, and C$_\alpha$–C$_\alpha$ distances are commonly used to measure inter-residue distances.</figcaption>
   </figure>
 
 <p>
-<strong>Chains fo amino acids.</strong> Proteins are linear polymers of amino acids, each with a central carbon ($C_\alpha$) bonded to a backbone (N-C-C) and a variable sidechain. The sequence of amino acids defines the protein's primary structure.
+<strong>Chains of amino acids.</strong> Proteins are linear polymers of amino acids, each with a central carbon (C$_\alpha$) bonded to a backbone (N-C-C) and a variable sidechain. The sequence of amino acids defines the protein's primary structure.
 </p>
 
 <p>
@@ -160,7 +162,7 @@ ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> pred
   </figure>
 
 <p>
-<strong>Moduel 1: ESM-2 Language Model.</strong> The input sequence is first processed by ESM-2, a 3B-parameter transformer pretrained on 250M protein sequences. ESM-2 produces a contextualized embedding $s_i \in \mathbb{R}^{2560}$ for each residue position $i$, capturing evolutionary and structural patterns learned during pretraining.
+<strong>Module 1: ESM-2 Language Model.</strong> The input sequence is first processed by ESM-2, a 3B-parameter transformer pretrained on 250M protein sequences. ESM-2 produces a contextualized embedding $s_i \in \mathbb{R}^{2560}$ for each residue position $i$, capturing evolutionary and structural patterns learned during pretraining.
 </p>
 
 <p>
@@ -213,34 +215,33 @@ where $\alpha_{ij}$ are attention weights and $V_{ij} = W_V z_{ij}$.
 <h2>When Does the Model Fold a Hairpin?</h2>
 
 <p>
-To understand ESMFold's internal mechanisms, we need a controlled experimental setup. We focus on predicting the structure of a 20-residue beta-hairpin motif (sequence: IQYTWNGRKILGORGTLKAR). This hairpin was designed to fold independently and has been experimentally characterized.
+We use activation patching to localize where hairpin formation is computed in the folding trunk. We select a <strong>donor protein</strong> containing a beta hairpin and a <strong>target protein</strong> containing a helix-turn-helix motif. We run both proteins through ESMFold, extracting the sequence representation $s$ and pairwise representation $z$ at each block of the folding trunk. During the target's forward pass, we replace representations in the target's helical region with the donor's hairpin representations, aligning the two regions at their loop positions. We then observe whether the output structure contains a hairpin in the patched region.
 </p>
 
     <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/FigureCActivationPatchingDraft4.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 3: Activation Patching Setup.</strong> We use activation patching to identify which blocks are necessary for hairpin folding. Activations from a corrupted sequence (unfolded structure) are patched into clean forward passes, and we measure whether the hairpin structure is preserved or disrupted.</figcaption>
+  <figcaption><strong>Figure 3: Activation Patching Setup.</strong> We run a donor protein containing a beta hairpin through ESMFold and extract the sequence (orange) and pairwise (green) representations of the hairpin region. During the forward pass of a target protein containing a helix-turn-helix motif, we replace the target's representations with the donor's hairpin representations at a single block, then measure if the output contains a hairpin.</figcaption>
   </figure>
 
 <p>
-<strong>Dataset construction.</strong> We created a dataset of 100 beta-hairpin sequences by mutating the wild-type sequence while preserving the overall structural motif. For each sequence, we verified that ESMFold predicts a folded hairpin structure (inter-strand $C_\alpha$ distance < 7 Å).
+<strong>Dataset construction.</strong> We curated a dataset of 106 target proteins consisting of alpha-helical structures from diverse protein families. For donor hairpins, we assembled a dataset of about 80,000 beta hairpins extracted from the Protein Data Bank. Each hairpin consists of two strands (5–10 residues each) connected by a short loop (2–5 residues). We identified internal loop regions in each target protein, then sampled 10 donor hairpins per loop, yielding about 5,000 patching experiments in total.
 </p>
 
 <p>
-<strong>Activation patching methodology.</strong> Following <a href="#ref-meng2022" class="citation-link">[Meng et al., 2022]</a>, we perform causal interventions to identify when the model "decides" to fold the hairpin:
-</p>
-
-<ol>
-<li><strong>Clean run:</strong> Forward pass on wild-type sequence → folded structure</li>
-<li><strong>Corrupted run:</strong> Forward pass on scrambled sequence → unfolded structure</li>
-<li><strong>Patched run:</strong> Start with clean run, but replace activations at block $b$ with corrupted activations → measure if structure is preserved</li>
-</ol>
-
-<p>
-If patching at block $b$ disrupts folding, then blocks 1 through $b$ must be critical for the folding decision.
+<strong>Full patching establishes feasibility.</strong> We first verify that patching can induce hairpin formation by patching both sequence and pairwise representations across all 48 blocks of the folding trunk. Approximately 40% of patches (~2,000 cases) successfully produce a hairpin in the target region, as measured by DSSP secondary structure assignment.
 </p>
 
 <p>
-<strong>Results.</strong> We find a sharp transition: patching blocks 1-24 (early blocks) has minimal effect, while patching blocks 25-48 (late blocks) disrupts folding. This suggests that <span class="stage-early">early blocks establish necessary biochemical context</span>, but <span class="stage-late">late blocks are where geometric constraints are encoded and the folding decision is made</span>.
+<strong>Single-block patching reveals two regimes.</strong> To localize the computation, we patch at a single block $k$, patching either sequence or pairwise representations alone. Restricting to the ~2,000 cases where full patching succeeded, we measure the success rate for each block and representation type:
+</p>
+
+<ul>
+<li><span class="stage-early"><strong>Sequence patches</strong> are effective in early blocks (0–7), with success rates peaking around 40% at block 0 and declining thereafter.</span></li>
+<li><span class="stage-late"><strong>Pairwise patches</strong> show the opposite pattern: they only become effective starting around block 25, reaching success rates around 20% by block 35.</span></li>
+</ul>
+
+<p>
+This reveals two distinct computational stages: <span class="stage-early">early blocks where sequence information drives hairpin formation</span>, and <span class="stage-late">late blocks where pairwise representations take over</span>.
 </p>
 
 <h2>Early Blocks: Building Pairwise Chemistry</h2>
@@ -248,25 +249,20 @@ If patching at block $b$ disrupts folding, then blocks 1 through $b$ must be cri
 <h3>Sequence Information Flows Into Pairwise Space</h3>
 
 <p>
-What happens in the early blocks (1-24)? We hypothesize that these blocks extract chemical features from the sequence representation $s_i$ and propagate them into the pairwise representation $z_{ij}$.
+Why does sequence patching only work in early blocks? We hypothesize that early blocks serve the critical role of transferring information from $s$ into $z$ via the <strong>seq2pair</strong> pathway, populating $z$ before downstream computations begin.
 </p>
-  
+
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/Figure2.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 4: Information Flow Across Blocks.</strong> We measure mutual information between sequence features and pairwise features across blocks. <span class="stage-early">Early blocks show increasing MI as sequence information is transferred to pairwise space via Seq2Pair layers.</span> <span class="stage-late">Late blocks show decreasing MI as geometric information becomes dominant.</span></figcaption>
+  <figcaption><strong>Figure 4: Information Flow Analysis.</strong> (a) Shift in representations under different interventions. Sequence patching at block 0 leads to pairwise representation alignment with the donor. Freezing seq2pair prevents this alignment. (b) Ablating seq2pair in early blocks dramatically reduces hairpin formation during sequence patching.</figcaption>
   </figure>
 
 <p>
-<strong>Measuring information flow.</strong> For each block $b$, we compute the mutual information $I(s_i^{(b)}; z_{ij}^{(b)})$ between the sequence representation at position $i$ and all pairwise features involving $i$. We find that:
+<strong>Representation similarity.</strong> After patching sequence at block 0, we track how the pairwise representation changes across blocks. We find that $z$ rapidly becomes donor-like in the first ~10 blocks, then changes only gradually afterward. This suggests a short early "write-in" window during which sequence-level information is transferred into $z$.
 </p>
 
-<ul>
-<li><span class="stage-early">Blocks 1-20: MI increases steadily, indicating sequence information is being transferred into pairwise space</span></li>
-<li><span class="stage-late">Blocks 25-48: MI plateaus or decreases, suggesting pairwise representation becomes more autonomous</span></li>
-</ul>
-
 <p>
-This confirms that <span class="stage-early">early blocks primarily implement sequence-to-pair information transfer</span>.
+<strong>Pathway ablations.</strong> We confirm that seq2pair is necessary for hairpin formation by performing sliding-window ablations. <span class="stage-early">Ablating seq2pair in blocks 0–20 dramatically reduces hairpin formation; ablating it in later blocks has little effect.</span> This confirms that sequence patches work because they propagate into $z$ via seq2pair during early blocks.
 </p>
 
 <h3>Which Sequence Features are Propagated?</h3>
@@ -307,72 +303,64 @@ $$z_{ij}^{\text{steered}} = z_{ij} + \lambda \cdot \vec{d}_{\text{charge}}$$
 <h3>Pairwise Representation Encodes Distance</h3>
 
 <p>
-While <span class="stage-early">early blocks encode chemical features</span>, our activation patching showed that <span class="stage-late">late blocks (25-48) are critical for the folding decision</span>. We hypothesize that late blocks encode geometric information—specifically, inter-residue distances.
+By the late blocks, sequence patching no longer induces hairpin formation, but pairwise patching does. This suggests that the pairwise representation $z$ has taken over as the primary carrier of folding-relevant information. We hypothesize that $z$ encodes spatial relationships—particularly pairwise distances.
 </p>
-   
+
  <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/Figure7ContactSteeringDraft12.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 6: Distance Encoding and Steering.</strong> <span class="stage-late">Late blocks encode $C_\alpha$ distances in the pairwise representation.</span> (a) Linear probe accuracy for distance prediction across blocks. (b) Steering experiment: adding the "contact" direction to $z_{ij}$ causes the structure module to predict closer distances.</figcaption>
+  <figcaption><strong>Figure 6: Distance Encoding and Steering.</strong> (a) $R^2$ score of linear distance probes reaches ~0.9 at late blocks. (b) Hydrogen bond formation peaks when steering blocks 20–35. (c) Steering setup: we steer cross-strand residue pairs toward a target distance of 5.5Å.</figcaption>
   </figure>
 
 <p>
-<strong>Distance probing.</strong> For each block $b$, we train a linear regression model to predict the final $C_\alpha$ distance $d_{ij}$ from the pairwise representation $z_{ij}^{(b)}$.
+<strong>Distance probing.</strong> We train linear probes to predict pairwise C$_\alpha$ distance from $z$ at each block. Even at block 0, $z$ contains some distance information from positional embeddings. But as $z$ is populated with sequence information and refined through triangular updates, <span class="stage-late">probe accuracy increases substantially, reaching $R^2 \approx 0.9$ by late blocks</span>.
 </p>
 
 <p>
-<strong>Result:</strong> <span class="stage-late">Probe accuracy is near-random for blocks 1-20, but increases sharply at block 25 and plateaus by block 35, reaching $R^2 = 0.82$.</span> This indicates that distance information crystallizes in late blocks.
+<strong>Distance steering.</strong> Since the probe is linear, we can steer toward a target distance (5.5Å, the typical C$_\alpha$–C$_\alpha$ spacing for cross-strand contacts in beta-sheets) by moving along the probe's weight direction:
 </p>
 
-<p>
-<strong>Contact steering.</strong> We identify the direction $\vec{d}_{\text{contact}}$ in $z_{ij}$ space that corresponds to "residues in contact" (distance < 8 Å). We then steer the representation:
-</p>
-
-$$z_{ij}^{\text{steered}} = z_{ij} + \lambda \cdot \vec{d}_{\text{contact}}$$
+$$z'_{ij} = z_{ij} - \alpha \cdot \mathbf{w}$$
 
 <p>
-<strong>Result:</strong> Steering at block 30 causes the structure module to predict reduced distances for the targeted pair $(i,j)$, with negligible effect on other pairs. Steering at block 10 has no effect. This confirms that <span class="stage-late">late $z_{ij}$ causally determines geometric outputs</span>.
+<strong>Result:</strong> <span class="stage-late">Steering in blocks 20–35 is most effective, with hydrogen bond formation peaking around 40%.</span> Steering in early blocks is less effective both because probes are less accurate and because subsequent computation can overwrite the perturbation. This confirms that late $z$ causally determines geometric outputs.
 </p>
 
 <h3>Pair2Seq Promotes Contact Information</h3>
 
 <p>
-How does distance information arise in $z_{ij}$? We investigate the role of the Pair2Seq operation, which transfers information from pairwise to sequence space.
+How does distance information in $z$ influence the rest of the computation? The pair2seq pathway projects $z$ to produce a scalar bias that modulates sequence self-attention.
 </p>
-   
+
  <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/Figure4Pair2seqDraft3.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 7: Pair2Seq Bias Analysis.</strong> We measure the attention weights $\alpha_{ij}$ in the Pair2Seq operation and find that <span class="stage-late">late blocks preferentially attend to pairs predicted to be in contact</span>, creating a feedback loop that reinforces geometric constraints.</figcaption>
+  <figcaption><strong>Figure 7: Pair2Seq Bias and Patching Effects.</strong> (a) After patching $z$, attention shifts toward donor contacts and away from target contacts. (b) Ablating the pair2seq bias after patching results in minor drops in hairpin formation.</figcaption>
   </figure>
 
 <p>
-<strong>Hypothesis:</strong> The Pair2Seq layer aggregates pairwise features $z_{ij}$ back to sequence space using attention. If the attention mechanism $\alpha_{ij}$ prioritizes certain pairs (e.g., those in contact), this could amplify geometric signals.
+<strong>Bias encodes contacts.</strong> In middle and late blocks, the pair2seq bias cleanly separates contacting residue pairs (C$_\alpha$ distance < 8Å) from non-contacts. <span class="stage-late">Residue pairs in contact receive substantially more positive bias than non-contacts</span>, encouraging the sequence attention to preferentially mix information between contacting residues.
 </p>
 
 <p>
-<strong>Analysis:</strong> For each block, we compute the average attention weight $\alpha_{ij}$ for pairs that are in contact in the final structure versus pairs that are not.
-</p>
-
-<p>
-<strong>Result:</strong> <span class="stage-late">Starting at block 28, Pair2Seq attention is strongly biased toward contact pairs (ROC-AUC = 0.76 by block 35).</span> This creates a feedback loop: pairs encoded as "close" in $z_{ij}$ receive higher attention in Pair2Seq, which reinforces their distance prediction in subsequent blocks.
+<strong>Causal role.</strong> We tested this by patching the pairwise representation at block 27 and measuring how sequence attention changes. <span class="stage-late">After patching, attention to donor-unique contacts increases substantially (up to 400%), while attention to target-unique contacts decreases.</span> The pairwise representation causally redirects which residues attend to each other.
 </p>
 
 <h3>The Structure Module Uses Z as a Distance Map</h3>
 
 <p>
-The final pairwise representation $z_{ij}^{(48)}$ is passed to the structure module, which outputs 3D coordinates. How does the structure module interpret $z_{ij}$?
+The pair2seq pathway is one route by which $z$ influences the output. But $z$ also feeds directly into the structure module, which produces the final 3D coordinates.
 </p>
 
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/Figure5StructureModuleScalingDraft12.png" style="width:100%; max-width:700px"></center>
-  <figcaption><strong>Figure 8: Structure Module Scaling Experiment.</strong> We scale the pairwise representation $z_{ij} \rightarrow \lambda z_{ij}$ and measure the effect on predicted distances. The structure module treats $z_{ij}$ approximately as a distance map, with scaling affecting distance predictions in a predictable manner.</figcaption>
+  <figcaption><strong>Figure 8: Structure Module Scaling Experiment.</strong> (a) Effect of scaling $z$ versus $s$ on mean pairwise C$_\alpha$ distance. Scaling $z$ monotonically scales the output structure; scaling $s$ has virtually no effect. (b) Example structures at different pairwise scaling factors.</figcaption>
   </figure>
-  
+
 <p>
-<strong>Scaling experiment.</strong> We intervene by scaling the entire pairwise representation: $z_{ij}^{\text{scaled}} = \lambda \cdot z_{ij}^{(48)}$, and measure how predicted distances change.
+<strong>Scaling experiment.</strong> We scaled the pairwise representation by factors ranging from 0 to 2 before it enters the structure module, while holding $s$ fixed. We then repeated the experiment scaling $s$ while holding $z$ fixed.
 </p>
 
 <p>
-<strong>Result:</strong> Scaling by $\lambda > 1$ causes predicted contacts to become stronger (distances decrease), while $\lambda < 1$ weakens them. This is consistent with the structure module treating $z_{ij}$ as a soft distance or contact map, rather than as abstract features.
+<strong>Result:</strong> <span class="stage-late">Scaling $z$ monotonically scales the mean pairwise distance between residues in the output structure.</span> Scaling up causes the protein to expand; scaling down causes it to contract. In contrast, scaling $s$ has virtually no effect on output geometry. Together with our steering experiments, this confirms that $z$ acts as a geometric blueprint that the structure module renders into 3D coordinates.
 </p>
 
 <h2>Related Work</h2>
