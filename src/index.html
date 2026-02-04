@@ -75,6 +75,15 @@ a.citation-link {
 /* Stage color coding */
 .stage-early { color: #D95F02; }
 .stage-late { color: #1B7F3A; }
+
+/* Two-column figure layout */
+.row figure {
+  margin-bottom: 20px;
+}
+.row figure figcaption {
+  font-size: 0.9em;
+  margin-top: 10px;
+}
 </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FD12LWN557"></script>
 <script>
@@ -139,7 +148,7 @@ In the first stage, early blocks initialize pairwise biochemical signals: residu
 
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/betaHairpin.jpg" style="width:100%; max-width:400px"></center>
-  <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure, and C$_\alpha$–C$_\alpha$ distances are commonly used to measure inter-residue distances.</figcaption>
+  <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure, and C$_\alpha$&ndash;C$_\alpha$ distances are commonly used to measure inter-residue distances.</figcaption>
   </figure>
 
 <p>
@@ -224,7 +233,7 @@ We use activation patching to localize where hairpin formation is computed in th
   </figure>
 
 <p>
-<strong>Dataset construction.</strong> We curated a dataset of 106 target proteins consisting of alpha-helical structures from diverse protein families. For donor hairpins, we assembled a dataset of about 80,000 beta hairpins extracted from the Protein Data Bank. Each hairpin consists of two strands (5–10 residues each) connected by a short loop (2–5 residues). We identified internal loop regions in each target protein, then sampled 10 donor hairpins per loop, yielding about 5,000 patching experiments in total.
+<strong>Dataset construction.</strong> We curated a dataset of 106 target proteins consisting of alpha-helical structures from diverse protein families. For donor hairpins, we assembled a dataset of about 80,000 beta hairpins extracted from the Protein Data Bank. Each hairpin consists of two strands (5&ndash;10 residues each) connected by a short loop (2&ndash;5 residues). We identified internal loop regions in each target protein, then sampled 10 donor hairpins per loop, yielding about 5,000 patching experiments in total.
 </p>
 
 <p>
@@ -236,7 +245,7 @@ We use activation patching to localize where hairpin formation is computed in th
 </p>
 
 <ul>
-<li><span class="stage-early"><strong>Sequence patches</strong> are effective in early blocks (0–7), with success rates peaking around 40% at block 0 and declining thereafter.</span></li>
+<li><span class="stage-early"><strong>Sequence patches</strong> are effective in early blocks (0-7), with success rates peaking around 40% at block 0 and declining thereafter.</span></li>
 <li><span class="stage-late"><strong>Pairwise patches</strong> show the opposite pattern: they only become effective starting around block 25, reaching success rates around 20% by block 35.</span></li>
 </ul>
 
@@ -262,40 +271,38 @@ Why does sequence patching only work in early blocks? We hypothesize that early 
 </p>
 
 <p>
-<strong>Pathway ablations.</strong> We confirm that seq2pair is necessary for hairpin formation by performing sliding-window ablations. <span class="stage-early">Ablating seq2pair in blocks 0–20 dramatically reduces hairpin formation; ablating it in later blocks has little effect.</span> This confirms that sequence patches work because they propagate into $z$ via seq2pair during early blocks.
+<strong>Pathway ablations.</strong> We confirm that seq2pair is necessary for hairpin formation by performing sliding-window ablations. <span class="stage-early">Ablating seq2pair in blocks 0&ndash;20 dramatically reduces hairpin formation; ablating it in later blocks has little effect.</span> This confirms that sequence patches work because they propagate into $z$ via seq2pair during early blocks.
 </p>
 
 <h3>Which Sequence Features are Propagated?</h3>
 
 <p>
-To identify which specific sequence features are transferred to pairwise space, we use <strong>linear probing</strong> and <strong>causal interventions</strong>.
+We investigate whether the model leverages biochemical features to guide folding. We focus on <strong>charge</strong>, which is biochemically relevant for hairpin stability: antiparallel beta strands are often stabilized by salt bridges between oppositely charged residues on facing positions.
 </p>
-  
+
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/Figure6ChargeBoomDraft4.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 5: Charge Direction Mechanism.</strong> <span class="stage-early">Early blocks propagate charge information from sequence to pairwise representations.</span> We show that intervening on charge-related features in $s_i$ causes predictable changes in $z_{ij}$ patterns, particularly for residue pairs with opposite charges.</figcaption>
+  <figcaption><strong>Figure 5: Electrostatic Complementarity Steering.</strong> (a) We steer the sequence representation toward opposite charges on the two helical regions flanking the loop. (b) Steering in early blocks (0&ndash;10) is most effective at inducing hydrogen bond formation. (c) Control: same-charge steering increases cross-strand distance, opposite-charge steering decreases it.</figcaption>
   </figure>
 
 <p>
-<strong>Charge direction.</strong> Beta-hairpins are often stabilized by electrostatic interactions between charged residues on opposite strands. We probe whether early blocks encode this.
+<strong>Charge is linearly encoded.</strong> We use a difference-in-means approach to identify a "charge direction" in the sequence representation space. Let $\mathcal{P} = \{\text{K}, \text{R}, \text{H}\}$ denote positively charged residues and $\mathcal{N} = \{\text{D}, \text{E}\}$ denote negatively charged residues. We compute:
+</p>
+
+$$v_{\text{charge}} = \frac{\bar{s}_{\mathcal{P}} - \bar{s}_{\mathcal{N}}}{\|\bar{s}_{\mathcal{P}} - \bar{s}_{\mathcal{N}}\|}$$
+
+<p>
+Projecting residue representations onto $v_{\text{charge}}$ shows clean separation between charge classes at early blocks, confirming that charge is linearly encoded.
 </p>
 
 <p>
-For each residue $i$, we compute its charge $q_i \in \{-1, 0, +1\}$ (negative for Asp/Glu, positive for Lys/Arg, neutral otherwise). We then train a linear probe to predict the product $q_i \cdot q_j$ from the pairwise representation $z_{ij}$.
+<strong>Electrostatic complementarity steering.</strong> Because this direction is linear, we can manipulate it. For a target helix-turn-helix region, we steer one helix toward positive charge and the other toward negative charge, mimicking the electrostatic complementarity of natural hairpins:
 </p>
 
-<p>
-<strong>Result:</strong> <span class="stage-early">The probe achieves 85% accuracy at block 12, indicating that early blocks explicitly represent charge complementarity in $z_{ij}$.</span>
-</p>
+$$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
 
 <p>
-<strong>Steering experiment.</strong> To verify this causally, we identify the direction in $z_{ij}$ space corresponding to "opposite charges attract." We then intervene by adding this direction to $z_{ij}$ for pairs with same charge:
-</p>
-
-$$z_{ij}^{\text{steered}} = z_{ij} + \lambda \cdot \vec{d}_{\text{charge}}$$
-
-<p>
-<strong>Result:</strong> Steering causes the model to predict structures with artificial salt bridges between same-charge residues, confirming that <span class="stage-early">early $z_{ij}$ encodes charge interactions that influence downstream geometry</span>.
+<strong>Result:</strong> <span class="stage-early">Complementarity steering induces hydrogen bond formation, with the effect concentrated in early blocks (0&ndash;10).</span> As a control, steering both strands to the same charge increases cross-strand distance (repulsion), while opposite charges decrease it (attraction). This confirms that the charge direction causally influences predicted geometry.
 </p>
 
 <h2>Late Blocks: Pairwise Geometry Emerges</h2>
@@ -308,7 +315,7 @@ By the late blocks, sequence patching no longer induces hairpin formation, but p
 
  <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/Figure7ContactSteeringDraft12.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 6: Distance Encoding and Steering.</strong> (a) $R^2$ score of linear distance probes reaches ~0.9 at late blocks. (b) Hydrogen bond formation peaks when steering blocks 20–35. (c) Steering setup: we steer cross-strand residue pairs toward a target distance of 5.5Å.</figcaption>
+  <figcaption><strong>Figure 6: Distance Encoding and Steering.</strong> (a) $R^2$ score of linear distance probes reaches ~0.9 at late blocks. (b) Hydrogen bond formation peaks when steering blocks 20&ndash;35. (c) Steering setup: we steer cross-strand residue pairs toward a target distance of 5.5&Aring;.</figcaption>
   </figure>
 
 <p>
@@ -316,13 +323,13 @@ By the late blocks, sequence patching no longer induces hairpin formation, but p
 </p>
 
 <p>
-<strong>Distance steering.</strong> Since the probe is linear, we can steer toward a target distance (5.5Å, the typical C$_\alpha$–C$_\alpha$ spacing for cross-strand contacts in beta-sheets) by moving along the probe's weight direction:
+<strong>Distance steering.</strong> Since the probe is linear, we can steer toward a target distance (5.5&Aring;, the typical C$_\alpha$&ndash;C$_\alpha$ spacing for cross-strand contacts in beta-sheets) by moving along the probe's weight direction:
 </p>
 
 $$z'_{ij} = z_{ij} - \alpha \cdot \mathbf{w}$$
 
 <p>
-<strong>Result:</strong> <span class="stage-late">Steering in blocks 20–35 is most effective, with hydrogen bond formation peaking around 40%.</span> Steering in early blocks is less effective both because probes are less accurate and because subsequent computation can overwrite the perturbation. This confirms that late $z$ causally determines geometric outputs.
+<strong>Result:</strong> <span class="stage-late">Steering in blocks 20&ndash;35 is most effective, with hydrogen bond formation peaking around 40%.</span> Steering in early blocks is less effective both because probes are less accurate and because subsequent computation can overwrite the perturbation. This confirms that late $z$ causally determines geometric outputs.
 </p>
 
 <h3>Pair2Seq Promotes Contact Information</h3>
@@ -330,14 +337,23 @@ $$z'_{ij} = z_{ij} - \alpha \cdot \mathbf{w}$$
 <p>
 How does distance information in $z$ influence the rest of the computation? The pair2seq pathway projects $z$ to produce a scalar bias that modulates sequence self-attention.
 </p>
-
- <figure class="center_image" style="margin-top: 30px">
-  <center><img src="images/paper/Figure4Pair2seqDraft3.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 7: Pair2Seq Bias and Patching Effects.</strong> (a) After patching $z$, attention shifts toward donor contacts and away from target contacts. (b) Ablating the pair2seq bias after patching results in minor drops in hairpin formation.</figcaption>
-  </figure>
+<div class="row" style="margin-top: 30px;">
+  <div class="col-md-6">
+    <figure class="center_image">
+      <center><img src="images/paper/Figure4Draft9.png" style="width:100%; max-width:400px"></center>
+      <figcaption><strong>Figure 7a: Pair2Seq Bias Encodes Contacts.</strong> (a) ROC-AUC for classifying contacts (C$_\alpha$ &lt; 8&Aring;) vs. non-contacts using bias values alone. The pair2seq bias cleanly separates contacts in middle and late blocks. (b) Heatmap of attention bias values (red = positive, blue = negative) with green contours showing residue pairs within 8&Aring;.</figcaption>
+    </figure>
+  </div>
+  <div class="col-md-6">
+    <figure class="center_image">
+      <center><img src="images/paper/Figure4Pair2seqDraft3.png" style="width:100%; max-width:400px"></center>
+      <figcaption><strong>Figure 7b: Pair2Seq Patching Effects.</strong> (a) After patching $z$, attention shifts toward donor contacts and away from target contacts. (b) Ablating the pair2seq bias after patching results in minor drops in hairpin formation.</figcaption>
+    </figure>
+  </div>
+</div>
 
 <p>
-<strong>Bias encodes contacts.</strong> In middle and late blocks, the pair2seq bias cleanly separates contacting residue pairs (C$_\alpha$ distance < 8Å) from non-contacts. <span class="stage-late">Residue pairs in contact receive substantially more positive bias than non-contacts</span>, encouraging the sequence attention to preferentially mix information between contacting residues.
+<strong>Bias encodes contacts.</strong> In middle and late blocks, the pair2seq bias cleanly separates contacting residue pairs (C$_\alpha$ distance &lt; 8&Aring;) from non-contacts. <span class="stage-late">Residue pairs in contact receive substantially more positive bias than non-contacts</span>, encouraging the sequence attention to preferentially mix information between contacting residues.
 </p>
 
 <p>
