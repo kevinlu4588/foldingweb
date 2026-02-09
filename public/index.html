@@ -49,8 +49,8 @@
 
 /* Green biology theme */
 .nd-pageheader {
-  background-color: rgba(61, 170, 115, 0.55) !important;
-  color: #000 !important;
+  background-color: rgba(35, 137, 86, 1.0) !important;
+  color: #ffffff !important;
 }
 .nd-pageheader h1, .nd-pageheader address {
   color: #000 !important;
@@ -64,7 +64,7 @@
   border-bottom: 1px solid #000;
 }
 .nd-pagefooter {
-  background-color: rgba(61, 170, 115, 0.55) !important;
+  background-color: rgb(41 227 133 / 55%) !important;
   color: #000 !important;
 }
 .nd-pagefooter a {
@@ -143,9 +143,9 @@ gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
 
 <div class="card" style="max-width: 1020px;">
 <div class="card-block">
-<h3>Abstract</h3>
+<h3>How Does AI Fold Proteins?</h3>
 <p>
-How do protein structure prediction models fold proteins? We investigate this question by tracing how ESMFold folds a beta hairpin, a prevalent structural motif. Through counterfactual interventions on model latents, we identify two computational stages in the folding trunk. In the first stage, early blocks initialize <em class="stage-early">pairwise biochemical signals</em>: residue identities and associated biochemical features like charge flow from sequence representations into pairwise representations. In the second stage, late blocks develop <em class="stage-late">pairwise spatial features</em>: distance and contact information accumulate in the pairwise representation. We demonstrate that the mechanisms underlying structural decisions of ESMFold can be localized, traced through interpretable representations, and manipulated with strong causal effects.
+Ever since AlphaFold showed that AI could predict protein structures with atomic accuracy, scientists have asked: how does it actually work? We study this question by opening up ESMFold, a state-of-the-art protein folding model. Our work is the first mechanistic analysis of the folding trunk, the core engine that turns amino acid sequences into 3D structures. We find that the trunk operates in two distinct phases: first assembling a chemical picture of residue interactions, then building the geometric blueprint that determines the final fold. These internal representations are not just interpretable: they can be steered to change the predicted structure.
 </p>
 
 
@@ -163,37 +163,22 @@ How do protein structure prediction models fold proteins? We investigate this qu
   <figcaption><strong>Figure 1: Two computational stages in the ESMFold folding trunk.</strong> We identify which latent representations in the model influence hairpin formation by patching activations from a hairpin protein into a helical protein at each block of the trunk, then measuring whether the output folds as a hairpin. <span class="stage-early">Sequence patches (orange)</span> induce hairpin formation in early blocks (0&ndash;7); <span class="stage-late">pairwise patches (green)</span> are effective in late blocks, with results aggregated over 2000 experiments. We show that stage 1 propagates biochemical features (e.g., charge) from sequence into pairwise representations, while stage 2 develops pairwise spatial features (distances, contacts) that modulate sequence attention and control output geometry.</figcaption>
   </figure>
 
-<h2>Introduction</h2>
+<h3>What is a Protein Structure?</h3>
 
-<p>
-How do protein folding models fold proteins? We study these questions in ESMFold. Like AlphaFold2, OpenFold, and Boltz-2, ESMFold is built around a <em>folding trunk</em>, the architectural component in which sequence becomes structure. The trunk iteratively refines a sequence representation while building a pairwise representation that encodes relationships between residues; a structure module then decodes these into 3D coordinates. Mechanistically understanding these learned computations could inform how we interact with, diagnose, and build on this entire class of models.
-</p>
 
-<p>
-In this work, we conduct the first mechanistic analysis of a protein model folding trunk and focus on how it folds a simple and prevalent structural motif: the beta hairpin. We use activation patching to transplant sequence and pairwise representations from a donor protein containing a beta hairpin into a target protein containing an alpha-helical region. By observing whether the patched trunk produces a hairpin in the target region, we find that ESMFold folds a hairpin in two computational stages.
-</p>
+  To understand our experiments, it helps to understand mroe about the protein folding task. The input is a sequence of amino acids (20 types like A,R,N,K) which we call "residues" when they are present in a protein. The output is a shape where each atom in a residue is given a precise location and orientation in 3d space, showing how the protein folds. BIologists often visualize a folded protein using a cartoon diagram like this:
 
-<p>
-In the first stage, early blocks initialize pairwise biochemical signals: residue identities and associated biochemical features like charge flow from sequence representations into pairwise representations. In the second stage, late blocks develop pairwise spatial features: distance and contact information accumulate in the pairwise representation.
-</p>
-<h2>Background</h2>
-
-<h3>Protein Structure</h3>
 
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/betaHairpin.jpg" style="width:100%; max-width:400px"></center>
   <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure, and C$_\alpha$&ndash;C$_\alpha$ distances are commonly used to measure inter-residue distances.</figcaption>
   </figure>
 
-<p>
-<strong>Chains of amino acids.</strong> Proteins are linear polymers of amino acids, each with a central carbon (C$_\alpha$) bonded to a backbone (N-C-C) and a variable sidechain. The sequence of amino acids defines the protein's primary structure.
-</p>
+  In our experiments we study howt he model folds a simple structural motif, the "beta hairpin", which consists of two which consists of a run of residues that form a 180-degree fold, where residues before and after the hairpin join into parallel "beta strands" due to affinities between matching residues on either side, as pictured above.
 
-<p>
-<strong>Secondary structure.</strong> Local regions of the backbone adopt regular conformations stabilized by hydrogen bonds. The two most common secondary structures are alpha-helices (spiral structures) and beta-sheets (extended strands). A beta-hairpin consists of two adjacent antiparallel beta strands connected by a tight turn.
-</p>
 
-<h3>Protein Structure Prediction with ESMFold</h3>
+
+<h3>What is inside an AI Protein Folding Model?</h3>
 
 <p>
 ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> predicts protein structure from sequence alone using a two-stage architecture:
