@@ -349,7 +349,7 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
       </select>
     </div>
   </div>
-  <figcaption><strong>Charge disruption animation.</strong> However, applying the “charge direction” to make both strands positive (blue) has the opposite effect: we observe a smooth repulsion effect as the DoM magnitude increases. </figcaption>
+  <figcaption><strong>Charge disruption animation.</strong> However, applying the "charge direction" to make both strands positive (blue) has the opposite effect: we observe a smooth repulsion as the DoM magnitude increases. </figcaption>
 </figure>
 
 <script>
@@ -390,7 +390,7 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
 <h3>Manipulating Linear Representations of Residue Distances</h3>
 
 <p>
-By the late blocks, sequence patching no longer induces hairpin formation, but pairwise patching does. This suggests that the pairwise representation $z$ has taken over as the primary carrier of folding-relevant information. We hypothesize that $z$ encodes spatial relationships—particularly pairwise distances.
+By the late blocks, sequence patching no longer induces hairpin formation, but pairwise patching does. This suggests that the pairwise representation $z$ has taken over as the primary carrier of folding-relevant information. We hypothesize that $z$ encodes spatial relationships: particularly pairwise distances.
 </p>
 
  <figure class="center_image" style="margin-top: 30px">
@@ -434,7 +434,7 @@ $$z'_{ij} = z_{ij} - \alpha \cdot \mathbf{w}$$
       </select>
     </div>
   </div>
-  <figcaption><strong>Distance steering: inducing closer contacts.</strong> Steering cross-strand residue pairs toward a target distance of 5.5&Aring; induces hydrogen bond formation in late blocks.</figcaption>
+  <figcaption><strong>Distance steering: inducing hydrogen bonds.</strong> Steering cross-strand residue pairs toward a target distance of 5.5&Aring; induces hydrogen bond formation in late blocks, with pairwise distances visualized as: dark green = close, light green = far.</figcaption>
 </figure>
 
 <script>
@@ -493,7 +493,7 @@ $$z'_{ij} = z_{ij} - \alpha \cdot \mathbf{w}$$
       </select>
     </div>
   </div>
-  <figcaption><strong>Distance steering: repelling farther apart.</strong> Steering cross-strand residue pairs toward a larger target distance pushes strands apart, serving as a control for the distance steering experiment.</figcaption>
+  <figcaption><strong>Distance repulsion: steering cross-strand residue pairs toward larger target distances breaking hairpin hydrogen bonds.</strong> We don't run this experiment in full for the paper, but its a nice control experiment and visualization. </figcaption>
 </figure>
 
 <script>
@@ -541,7 +541,7 @@ How does distance information in $z$ influence the rest of the computation? The 
   </figure>
 
 <p>
-<strong>Bias encodes contacts.</strong> In middle and late blocks, the pair2seq bias cleanly separates contacting residue pairs (C$_\alpha$ distance &lt; 8&Aring;) from non-contacts. <span class="stage-late">Residue pairs in contact receive substantially more positive bias than non-contacts</span>, encouraging the sequence attention to preferentially mix information between contacting residues. We visualize the bias values across blocks in the <a href="#appendix-bias-maps">Appendix</a>, along with per-head biases which show distinct patterns and suggest head specialization as an area for future investigation.
+<strong>Bias encodes contacts.</strong> In middle and late blocks, the pair2seq bias cleanly separates contacting residue pairs (C$_\alpha$ distance &lt; 8&Aring;) from non-contacts (Fig. 7a). <span class="stage-late">Residue pairs in contact receive substantially more positive bias than non-contacts</span>, encouraging the sequence attention to preferentially mix information between contacting residues. We visualize the bias values across blocks in the <a href="#appendix-bias-maps">Appendix</a>, along with per-head biases which show distinct patterns and suggest head specialization as an area for future investigation.
 </p>
 
 <p>
@@ -740,7 +740,7 @@ Each panel shows the bias term $\beta_{ij}$, averaged across all 8 attention hea
 <h3>Per-Head Bias at Block 32</h3>
 
 <p>
-Individual attention head bias values for protein 6rwc at block 32. Different heads exhibit distinct patterns: some heads show strong contact-aligned bias, while others capture different spatial relationships or show more diffuse patterns. This specialization suggests that individual heads attend to complementary aspects of pairwise geometry.
+Individual attention head bias values for protein 6rwc at block 32. Different heads exhibit distinct patterns: some heads show strong contact-aligned bias, while others capture different spatial relationships or show more diffuse patterns. Block 32 head 2 and head 4 generally show this specialized pattern across different protein types, suggests that individual heads attend to complementary aspects of pairwise geometry.
 </p>
 
 <div class="row">
