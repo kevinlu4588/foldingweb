@@ -207,7 +207,7 @@ gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
 
 <div class="card" style="max-width: 1020px;">
 <div class="card-block">
-<h3>How AI Models Fold Proteins?</h3>
+<h3>How Do AI Models Fold Proteins?</h3>
 <p>
 Ever since AlphaFold showed that AI could predict protein structures with atomic accuracy, scientists have asked: how does it actually work? We study this question by opening up ESMFold, a state-of-the-art protein folding model. Our work is the first mechanistic analysis of the folding trunk, the core engine that turns amino acid sequences into 3D structures. We find that the trunk operates in two distinct phases: first assembling a chemical picture of residue interactions, then building the geometric blueprint that determines the final fold. These internal representations are not just interpretable: they can be steered to change the predicted structure.
 </p>
@@ -230,7 +230,9 @@ Ever since AlphaFold showed that AI could predict protein structures with atomic
 <h3>What is a Protein Structure?</h3>
 
 
-  To understand our experiments, it helps to understand more about the protein folding task. The input is a sequence of amino acids (20 types like A,R,N,K) which we call "residues" when they are present in a protein. The output is a shape where each atom in a residue is given a precise location and orientation in 3d space, showing how the protein folds. BIologists often visualize a folded protein using a cartoon diagram like this:
+<p>
+  To understand our experiments, it helps to understand more about the protein folding task. The input is a sequence of amino acids (20 types like A, R, N, K) which we call "residues" when they are present in a protein. The output is a shape where each atom in a residue is given a precise location and orientation in 3D space, showing how the protein folds. Biologists often visualize a folded protein using a cartoon diagram like this:
+</p>
 
 
   <figure class="center_image" style="margin-top: 30px">
@@ -238,7 +240,9 @@ Ever since AlphaFold showed that AI could predict protein structures with atomic
   <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure, and C$_\alpha$&ndash;C$_\alpha$ distances are commonly used to measure inter-residue distances.</figcaption>
   </figure>
 
-  In our experiments we study how the model folds a simple structural motif, the "beta hairpin", which consists of a two strands that form a 180-degree fold, where residues before and after the hairpin join into parallel "beta strands" due to affinities between matching residues on either side.
+<p>
+  In our experiments we study how the model folds a simple structural motif, the "beta hairpin", which consists of two strands that form a 180-degree fold, where residues before and after the turn join into antiparallel "beta strands" due to affinities between matching residues on either side.
+</p>
 
 
 
@@ -250,7 +254,7 @@ ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> pred
 
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/esmfold_architecture.png" style="width:80%; max-width:800px"></center>
-  <figcaption><strong>Figure 1: ESMFold Architecture.</strong> The model consists of (1) ESM-2 language model that embeds the sequence, (2) Folding Trunk that processes sequence and pairwise representations through multiple blocks, and (3) Structure Module that converts pairwise features into 3D coordinates.</figcaption>
+  <figcaption><strong>Figure 2: ESMFold Architecture.</strong> The model consists of (1) ESM-2 language model that embeds the sequence, (2) Folding Trunk that processes sequence and pairwise representations through multiple blocks, and (3) Structure Module that converts pairwise features into 3D coordinates.</figcaption>
   </figure>
 
 <p>
@@ -307,7 +311,7 @@ We ask whether the model leverages biochemical features to guide folding, and fo
 
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/Figure6ChargeBoomDraft4.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 5: Electrostatic Complementarity Steering.</strong> (a) We steer the sequence representation toward opposite charges on the two helical regions flanking the loop. (b) Steering in early blocks (0&ndash;10) is most effective at inducing hydrogen bond formation. (c) Control: same-charge steering increases cross-strand distance, opposite-charge steering decreases it.</figcaption>
+  <figcaption><strong>Figure 4: Electrostatic Complementarity Steering.</strong> (a) We steer the sequence representation toward opposite charges on the two helical regions flanking the loop. (b) Steering in early blocks (0&ndash;10) is most effective at inducing hydrogen bond formation. (c) Control: same-charge steering increases cross-strand distance, opposite-charge steering decreases it.</figcaption>
   </figure>
 
 <p>
@@ -353,7 +357,7 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
       </select>
     </div>
   </div>
-  <figcaption><strong>Charge attraction animation.</strong> Steering opposite charges toward each other decreases cross-strand distance, demonstrating electrostatic attraction. As magnitude increases, the protein begins to collapse in on itself (possibly due to the level of attraction, or because of out of distribution shifts). </figcaption>
+  <figcaption><strong>Charge attraction animation.</strong> Steering opposite charges toward each other decreases cross-strand distance, demonstrating electrostatic attraction. As magnitude increases, the protein begins to collapse in on itself (possibly due to the level of attraction, or because of out-of-distribution shifts). </figcaption>
 </figure>
 
 <script>
@@ -412,7 +416,7 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
       </select>
     </div>
   </div>
-  <figcaption><strong>Charge disruption animation.</strong> However, applying the "charge direction" to make both strands positive (blue) has the opposite effect: we observe a smooth repulsion as the DoM magnitude increases. </figcaption>
+  <figcaption><strong>Charge disruption animation.</strong> However, applying the "charge direction" to make both strands positive (blue) has the opposite effect: we observe a smooth repulsion as the steering magnitude increases. </figcaption>
 </figure>
 
 <script>
@@ -458,7 +462,7 @@ By the late blocks, sequence patching no longer induces hairpin formation, but p
 
  <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/Figure7ContactSteeringDraft12.png" style="width:100%; max-width:800px"></center>
-  <figcaption><strong>Figure 6: Distance Encoding and Steering.</strong> (a) $R^2$ score of linear distance probes reaches ~0.9 at late blocks. (b) Hydrogen bond formation peaks when steering blocks 20&ndash;35. (c) Steering setup: we steer cross-strand residue pairs toward a target distance of 5.5&Aring;.</figcaption>
+  <figcaption><strong>Figure 5: Distance Encoding and Steering.</strong> (a) $R^2$ score of linear distance probes reaches ~0.9 at late blocks. (b) Hydrogen bond formation peaks when steering blocks 20&ndash;35. (c) Steering setup: we steer cross-strand residue pairs toward a target distance of 5.5&Aring;.</figcaption>
   </figure>
 
 <p>
@@ -556,7 +560,7 @@ $$z'_{ij} = z_{ij} - \alpha \cdot \mathbf{w}$$
       </select>
     </div>
   </div>
-  <figcaption><strong>Distance repulsion: steering cross-strand residue pairs toward larger target distances breaking hairpin hydrogen bonds.</strong> We don't run this experiment in full for the paper, but its a nice control experiment and visualization. </figcaption>
+  <figcaption><strong>Distance repulsion: steering cross-strand residue pairs toward larger target distances breaking hairpin hydrogen bonds.</strong> We don't run this experiment in full for the paper, but it's a nice control experiment and visualization. </figcaption>
 </figure>
 
 <script>
@@ -600,11 +604,11 @@ How does distance information in $z$ influence the rest of the computation? The 
 </p>
   <figure class="center_image" style="margin-top: 30px;">
     <center><img src="images/paper/Figure4Wide.png" style="width:100%; max-width:900px"></center>
-    <figcaption><strong>Figure 7: Pair2Seq Bias and Patching Effects.</strong> (a) ROC-AUC for classifying contacts (C$_\alpha$ &lt; 8&Aring;) vs. non-contacts using bias values alone. The pair2seq bias cleanly separates contacts in middle and late blocks. (b) Heatmap of attention bias values (red = positive, blue = negative) with green contours showing residue pairs within 8&Aring;. (c) After patching $z$, attention shifts toward donor contacts and away from target contacts. (d) Ablating the pair2seq bias after patching results in minor drops in hairpin formation.</figcaption>
+    <figcaption><strong>Figure 6: Pair2Seq Bias and Patching Effects.</strong> (a) ROC-AUC for classifying contacts (C$_\alpha$ &lt; 8&Aring;) vs. non-contacts using bias values alone. The pair2seq bias cleanly separates contacts in middle and late blocks. (b) Heatmap of attention bias values (red = positive, blue = negative) with green contours showing residue pairs within 8&Aring;. (c) After patching $z$, attention shifts toward donor contacts and away from target contacts. (d) Ablating the pair2seq bias after patching results in minor drops in hairpin formation.</figcaption>
   </figure>
 
 <p>
-<strong>Bias encodes contacts.</strong> In middle and late blocks, the pair2seq bias cleanly separates contacting residue pairs (C$_\alpha$ distance &lt; 8&Aring;) from non-contacts (Fig. 7a). <span class="stage-late">Residue pairs in contact receive substantially more positive bias than non-contacts</span>, encouraging the sequence attention to preferentially mix information between contacting residues. We visualize the bias values across blocks in the <a href="#appendix-bias-maps">Appendix</a>, along with per-head biases which show distinct patterns and suggest head specialization as an area for future investigation.
+<strong>Bias encodes contacts.</strong> In middle and late blocks, the pair2seq bias cleanly separates contacting residue pairs (C$_\alpha$ distance &lt; 8&Aring;) from non-contacts (Fig. 6a). <span class="stage-late">Residue pairs in contact receive substantially more positive bias than non-contacts</span>, encouraging the sequence attention to preferentially mix information between contacting residues. We visualize the bias values across blocks in the <a href="#appendix-bias-maps">Appendix</a>, along with per-head biases which show distinct patterns and suggest head specialization as an area for future investigation.
 </p>
 
 <p>
@@ -619,7 +623,7 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 
   <figure class="center_image" style="margin-top: 30px">
   <center><img src="images/paper/Figure5StructureModuleScalingDraft12.png" style="width:100%; max-width:700px"></center>
-  <figcaption><strong>Figure 8: Structure Module Scaling Experiment.</strong> (a) Effect of scaling $z$ versus $s$ on mean pairwise C$_\alpha$ distance. Scaling $z$ monotonically scales the output structure; scaling $s$ has virtually no effect. (b) Example structures at different pairwise scaling factors.</figcaption>
+  <figcaption><strong>Figure 7: Structure Module Scaling Experiment.</strong> (a) Effect of scaling $z$ versus $s$ on mean pairwise C$_\alpha$ distance. Scaling $z$ monotonically scales the output structure; scaling $s$ has virtually no effect. (b) Example structures at different pairwise scaling factors.</figcaption>
   </figure>
 
 <p>
@@ -838,7 +842,7 @@ Each panel shows the bias term $\beta_{ij}$, averaged across all 8 attention hea
 <h3>Per-Head Bias at Block 32</h3>
 
 <p>
-Individual attention head bias values for protein 6rwc at block 32. Different heads exhibit distinct patterns: some heads show strong contact-aligned bias, while others capture different spatial relationships or show more diffuse patterns. Block 32 head 2 and head 4 generally show this specialized pattern across different protein types, suggests that individual heads attend to complementary aspects of pairwise geometry.
+Individual attention head bias values for protein 6rwc at block 32. Different heads exhibit distinct patterns: some heads show strong contact-aligned bias, while others capture different spatial relationships or show more diffuse patterns. Block 32 head 2 and head 4 generally show this specialized pattern across different protein types, suggesting that individual heads attend to complementary aspects of pairwise geometry.
 </p>
 
 <div class="row">
