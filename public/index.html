@@ -447,7 +447,64 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 <p>
 <strong>Result:</strong> <span class="stage-late">Scaling $z$ monotonically scales the mean pairwise distance between residues in the output structure.</span> Scaling up causes the protein to expand; scaling down causes it to contract. In contrast, scaling $s$ has virtually no effect on output geometry. Together with our steering experiments, this confirms that $z$ acts as a geometric blueprint that the structure module renders into 3D coordinates.
 </p>
+<figure class="center_image" style="margin-top: 30px">
+  <div class="video-widget" style="max-width: 1000px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #000;">
+    <video id="zsweep-video" muted playsinline preload="auto" style="width: 100%; display: block;">
+      <source src="z_sweep.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="video-controls" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8f8f8; border-top: 1px solid #ddd; font-size: 14px; font-family: 'Open Sans', sans-serif;">
+      <button id="zsweep-play-btn" onclick="toggleZsweepPlay()" style="border: none; background: none; cursor: pointer; font-size: 18px; padding: 2px 6px; line-height: 1;" title="Play/Pause">&#9654;</button>
+      <input id="zsweep-scrubber" type="range" min="0" max="1000" value="0" step="1" style="flex: 1; cursor: pointer; accent-color: rgb(15, 103, 59);" oninput="scrubZsweep(this.value)">
+      <span id="zsweep-time" style="min-width: 70px; text-align: center; color: #555; font-size: 12px;">0:00 / 0:00</span>
+      <label style="display: flex; align-items: center; gap: 4px; color: #555; font-size: 12px; margin: 0; cursor: pointer;" title="Loop playback">
+        <input id="zsweep-loop" type="checkbox" onchange="document.getElementById('zsweep-video').loop = this.checked" style="accent-color: rgb(15, 103, 59);"> Loop
+      </label>
+      <select id="zsweep-speed" onchange="document.getElementById('zsweep-video').playbackRate = parseFloat(this.value)" style="border: 1px solid #ccc; border-radius: 4px; padding: 2px 4px; font-size: 12px; background: #fff; cursor: pointer;">
+        <option value="0.25">0.25x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+    </div>
+  </div>
+  <figcaption><strong>Pairwise scaling animation.</strong> Sweeping the pairwise representation scaling factor from 0 to 2 shows the protein expanding and contracting, confirming that $z$ acts as a geometric blueprint for the output structure.</figcaption>
+</figure>
 
+<script>
+(function() {
+  var vid = document.getElementById('zsweep-video');
+  var btn = document.getElementById('zsweep-play-btn');
+  var scrubber = document.getElementById('zsweep-scrubber');
+  var timeDisplay = document.getElementById('zsweep-time');
+  vid.loop = false;
+
+  function fmt(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  vid.addEventListener('timeupdate', function() {
+    if (vid.duration) {
+      scrubber.value = (vid.currentTime / vid.duration) * 1000;
+      timeDisplay.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration);
+    }
+  });
+
+  vid.addEventListener('play', function() { btn.innerHTML = '&#9646;&#9646;'; });
+  vid.addEventListener('pause', function() { btn.innerHTML = '&#9654;'; });
+
+  window.toggleZsweepPlay = function() {
+    if (vid.paused) { vid.play(); } else { vid.pause(); }
+  };
+
+  window.scrubZsweep = function(val) {
+    if (vid.duration) { vid.currentTime = (val / 1000) * vid.duration; }
+  };
+})();
+</script>
 
 <h2>References</h2>
 
