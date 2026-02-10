@@ -324,6 +324,66 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
 <strong>Result:</strong> <span class="stage-early">Complementarity steering induces hydrogen bond formation, with the effect concentrated in early blocks (0&ndash;10).</span> As a control, steering both strands to the same charge increases cross-strand distance (repulsion), while opposite charges decrease it (attraction). This confirms that the charge direction causally influences predicted geometry.
 </p>
 
+<figure class="center_image" style="margin-top: 30px">
+  <div class="video-widget" style="max-width: 800px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #000;">
+    <video id="disruption-video" muted playsinline preload="auto" style="width: 100%; display: block;">
+      <source src="disruption.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="video-controls" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8f8f8; border-top: 1px solid #ddd; font-size: 14px; font-family: 'Open Sans', sans-serif;">
+      <button id="disruption-play-btn" onclick="toggleDisruptionPlay()" style="border: none; background: none; cursor: pointer; font-size: 18px; padding: 2px 6px; line-height: 1;" title="Play/Pause">&#9654;</button>
+      <input id="disruption-scrubber" type="range" min="0" max="1000" value="0" step="1" style="flex: 1; cursor: pointer; accent-color: rgb(15, 103, 59);" oninput="scrubDisruption(this.value)">
+      <span id="disruption-time" style="min-width: 70px; text-align: center; color: #555; font-size: 12px;">0:00 / 0:00</span>
+      <label style="display: flex; align-items: center; gap: 4px; color: #555; font-size: 12px; margin: 0; cursor: pointer;" title="Loop playback">
+        <input id="disruption-loop" type="checkbox" checked onchange="document.getElementById('disruption-video').loop = this.checked" style="accent-color: rgb(15, 103, 59);"> Loop
+      </label>
+      <select id="disruption-speed" onchange="document.getElementById('disruption-video').playbackRate = parseFloat(this.value)" style="border: 1px solid #ccc; border-radius: 4px; padding: 2px 4px; font-size: 12px; background: #fff; cursor: pointer;">
+        <option value="0.25">0.25x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+    </div>
+  </div>
+  <figcaption><strong>Charge disruption animation.</strong> Visualizing the effect of electrostatic complementarity steering on predicted protein structure. Use the controls to scrub through the animation or adjust playback speed.</figcaption>
+</figure>
+
+<script>
+(function() {
+  var vid = document.getElementById('disruption-video');
+  var btn = document.getElementById('disruption-play-btn');
+  var scrubber = document.getElementById('disruption-scrubber');
+  var timeDisplay = document.getElementById('disruption-time');
+  vid.loop = true;
+
+  function fmt(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  vid.addEventListener('timeupdate', function() {
+    if (vid.duration) {
+      scrubber.value = (vid.currentTime / vid.duration) * 1000;
+      timeDisplay.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration);
+    }
+  });
+
+  vid.addEventListener('play', function() { btn.innerHTML = '&#9646;&#9646;'; });
+  vid.addEventListener('pause', function() { btn.innerHTML = '&#9654;'; });
+
+  window.toggleDisruptionPlay = function() {
+    if (vid.paused) { vid.play(); } else { vid.pause(); }
+  };
+
+  window.scrubDisruption = function(val) {
+    if (vid.duration) { vid.currentTime = (val / 1000) * vid.duration; }
+  };
+})();
+</script>
+
+
 <h2>Late Blocks: Pairwise Geometry Emerges</h2>
 
 <h3>Pairwise Representation Encodes Distance</h3>
