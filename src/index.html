@@ -175,14 +175,14 @@ Ever since AlphaFold showed that AI could predict protein structures with atomic
   <figcaption><strong>Beta-hairpin structure.</strong> A simple protein motif consisting of two antiparallel beta strands connected by a tight turn. Backbone atoms are shown with hydrogen bonds (dashed lines) stabilizing the sheet structure, and C$_\alpha$&ndash;C$_\alpha$ distances are commonly used to measure inter-residue distances.</figcaption>
   </figure>
 
-  In our experiments we study how the model folds a simple structural motif, the "beta hairpin", which consists of two which consists of a run of residues that form a 180-degree fold, where residues before and after the hairpin join into parallel "beta strands" due to affinities between matching residues on either side, as pictured above.
+  In our experiments we study how the model folds a simple structural motif, the "beta hairpin", which consists of a two strands that form a 180-degree fold, where residues before and after the hairpin join into parallel "beta strands" due to affinities between matching residues on either side.
 
 
 
 <h3>What is inside an AI Protein Folding Model?</h3>
 
 <p>
-ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> predicts protein structure from sequence alone using a two-stage architecture:
+ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> predicts protein structure from sequence alone using a three-module architecture:
 </p>
 
   <figure class="center_image" style="margin-top: 30px">
@@ -205,11 +205,12 @@ ESMFold <a href="#ref-lin2023" class="citation-link">[Lin et al., 2023]</a> pred
 
 
 <p>
-<strong>Triangle updates and attention:</strong> The pairwise representation is updated using triangle multiplicative updates (inspired by AlphaFold2) and row/column attention to propagate constraints across the 2D grid.
+<strong>Attention and Triangular Updates:</strong> Within each block, the sequence representation is updated via self-attention, while the pairwise representation is refined through triangular multiplicative updates (inspired by AlphaFold2) and row/column-based attention. The two representations are also coupled: each block exchanges information between them.
+
 </p>
 
 <p>
-<strong>Stage 3: Structure Module.</strong> After 48 folding blocks, the final pairwise representation $z_{ij}$ is passed to a structure module that predicts 3D coordinates.
+<strong>Module 3: Structure Module.</strong> After 48 folding blocks, the final pairwise representation $z_{ij}$ is passed to a structure module that predicts 3D coordinates.
 </p>
 
 <h2>When Does the Model Fold a Hairpin?</h2>
@@ -224,7 +225,7 @@ We use activation patching to localize where hairpin formation is computed in th
   </figure>
 
 <p>
-<strong>Single-block patching reveals two regimes.</strong> To localize the computation, we patch at a single block $k$, patching either sequence or pairwise representations alone. Restricting to the ~2,000 cases where full patching succeeded, we measure the success rate for each block and representation type:
+<strong>Single-block patching reveals two regimes (Figure 1).</strong> To localize the computation, we patch at a single block $k$, patching either sequence or pairwise representations alone. Restricting to the ~2,000 cases where full patching succeeded, we measure the success rate for each block and representation type:
 </p>
 
 <ul>
@@ -238,7 +239,7 @@ We then investigate two distinct computational mechanisms: <span class="stage-ea
 
 <h2>ESMFold Learns and Uses Representations of Charge</h2>
 <p>
-We investigate whether the model leverages biochemical features to guide folding. We focus on <strong>charge</strong>, which is biochemically relevant for hairpin stability: antiparallel beta strands are often stabilized by salt bridges between oppositely charged residues on facing positions.
+We ask whether the model leverages biochemical features to guide folding, and focus on <strong>charge</strong>. Charge is biochemically relevant for hairpin stability: antiparallel beta strands are often stabilized by salt bridges between oppositely charged residues on facing positions.
 </p>
 
   <figure class="center_image" style="margin-top: 30px">
@@ -289,7 +290,7 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
       </select>
     </div>
   </div>
-  <figcaption><strong>Charge attraction animation.</strong> Steering opposite charges toward each other decreases cross-strand distance, demonstrating electrostatic attraction. Use the controls to scrub through the animation or adjust playback speed.</figcaption>
+  <figcaption><strong>Charge attraction animation.</strong> Steering opposite charges toward each other decreases cross-strand distance, demonstrating electrostatic attraction. As magnitude increases, the protein begins to collapse in on itself (possibly due to the level of attraction, or because of out of distribution shifts). </figcaption>
 </figure>
 
 <script>
@@ -348,7 +349,7 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
       </select>
     </div>
   </div>
-  <figcaption><strong>Charge disruption animation.</strong> Visualizing the effect of electrostatic complementarity steering on predicted protein structure. Use the controls to scrub through the animation or adjust playback speed.</figcaption>
+  <figcaption><strong>Charge disruption animation.</strong> However, applying the “charge direction” to make both strands positive (blue) has the opposite effect: we observe a smooth repulsion effect as the DoM magnitude increases. </figcaption>
 </figure>
 
 <script>
@@ -411,8 +412,123 @@ $$z'_{ij} = z_{ij} - \alpha \cdot \mathbf{w}$$
 <strong>Result:</strong> <span class="stage-late">Steering in blocks 20&ndash;35 is most effective, with hydrogen bond formation peaking around 40%.</span> Steering in early blocks is less effective both because probes are less accurate and because subsequent computation can overwrite the perturbation. This confirms that late $z$ causally determines geometric outputs.
 </p>
 
-### Distance steering animation: ind_closer.mp4
-### Distance steering animation: rep_farther.mp4
+<figure class="center_image" style="margin-top: 30px">
+  <div class="video-widget" style="max-width: 1000px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #000;">
+    <video id="indcloser-video" muted playsinline preload="auto" style="width: 100%; display: block;">
+      <source src="ind_closer.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="video-controls" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8f8f8; border-top: 1px solid #ddd; font-size: 14px; font-family: 'Open Sans', sans-serif;">
+      <button id="indcloser-play-btn" onclick="toggleIndcloserPlay()" style="border: none; background: none; cursor: pointer; font-size: 18px; padding: 2px 6px; line-height: 1;" title="Play/Pause">&#9654;</button>
+      <input id="indcloser-scrubber" type="range" min="0" max="1000" value="0" step="1" style="flex: 1; cursor: pointer; accent-color: rgb(15, 103, 59);" oninput="scrubIndcloser(this.value)">
+      <span id="indcloser-time" style="min-width: 70px; text-align: center; color: #555; font-size: 12px;">0:00 / 0:00</span>
+      <label style="display: flex; align-items: center; gap: 4px; color: #555; font-size: 12px; margin: 0; cursor: pointer;" title="Loop playback">
+        <input id="indcloser-loop" type="checkbox" onchange="document.getElementById('indcloser-video').loop = this.checked" style="accent-color: rgb(15, 103, 59);"> Loop
+      </label>
+      <select id="indcloser-speed" onchange="document.getElementById('indcloser-video').playbackRate = parseFloat(this.value)" style="border: 1px solid #ccc; border-radius: 4px; padding: 2px 4px; font-size: 12px; background: #fff; cursor: pointer;">
+        <option value="0.25">0.25x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+    </div>
+  </div>
+  <figcaption><strong>Distance steering: inducing closer contacts.</strong> Steering cross-strand residue pairs toward a target distance of 5.5&Aring; induces hydrogen bond formation in late blocks.</figcaption>
+</figure>
+
+<script>
+(function() {
+  var vid = document.getElementById('indcloser-video');
+  var btn = document.getElementById('indcloser-play-btn');
+  var scrubber = document.getElementById('indcloser-scrubber');
+  var timeDisplay = document.getElementById('indcloser-time');
+  vid.loop = false;
+
+  function fmt(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  vid.addEventListener('timeupdate', function() {
+    if (vid.duration) {
+      scrubber.value = (vid.currentTime / vid.duration) * 1000;
+      timeDisplay.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration);
+    }
+  });
+
+  vid.addEventListener('play', function() { btn.innerHTML = '&#9646;&#9646;'; });
+  vid.addEventListener('pause', function() { btn.innerHTML = '&#9654;'; });
+
+  window.toggleIndcloserPlay = function() {
+    if (vid.paused) { vid.play(); } else { vid.pause(); }
+  };
+
+  window.scrubIndcloser = function(val) {
+    if (vid.duration) { vid.currentTime = (val / 1000) * vid.duration; }
+  };
+})();
+</script>
+
+<figure class="center_image" style="margin-top: 30px">
+  <div class="video-widget" style="max-width: 1000px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #000;">
+    <video id="repfarther-video" muted playsinline preload="auto" style="width: 100%; display: block;">
+      <source src="rep_farther.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="video-controls" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8f8f8; border-top: 1px solid #ddd; font-size: 14px; font-family: 'Open Sans', sans-serif;">
+      <button id="repfarther-play-btn" onclick="toggleRepfartherPlay()" style="border: none; background: none; cursor: pointer; font-size: 18px; padding: 2px 6px; line-height: 1;" title="Play/Pause">&#9654;</button>
+      <input id="repfarther-scrubber" type="range" min="0" max="1000" value="0" step="1" style="flex: 1; cursor: pointer; accent-color: rgb(15, 103, 59);" oninput="scrubRepfarther(this.value)">
+      <span id="repfarther-time" style="min-width: 70px; text-align: center; color: #555; font-size: 12px;">0:00 / 0:00</span>
+      <label style="display: flex; align-items: center; gap: 4px; color: #555; font-size: 12px; margin: 0; cursor: pointer;" title="Loop playback">
+        <input id="repfarther-loop" type="checkbox" onchange="document.getElementById('repfarther-video').loop = this.checked" style="accent-color: rgb(15, 103, 59);"> Loop
+      </label>
+      <select id="repfarther-speed" onchange="document.getElementById('repfarther-video').playbackRate = parseFloat(this.value)" style="border: 1px solid #ccc; border-radius: 4px; padding: 2px 4px; font-size: 12px; background: #fff; cursor: pointer;">
+        <option value="0.25">0.25x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+    </div>
+  </div>
+  <figcaption><strong>Distance steering: repelling farther apart.</strong> Steering cross-strand residue pairs toward a larger target distance pushes strands apart, serving as a control for the distance steering experiment.</figcaption>
+</figure>
+
+<script>
+(function() {
+  var vid = document.getElementById('repfarther-video');
+  var btn = document.getElementById('repfarther-play-btn');
+  var scrubber = document.getElementById('repfarther-scrubber');
+  var timeDisplay = document.getElementById('repfarther-time');
+  vid.loop = false;
+
+  function fmt(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  vid.addEventListener('timeupdate', function() {
+    if (vid.duration) {
+      scrubber.value = (vid.currentTime / vid.duration) * 1000;
+      timeDisplay.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration);
+    }
+  });
+
+  vid.addEventListener('play', function() { btn.innerHTML = '&#9646;&#9646;'; });
+  vid.addEventListener('pause', function() { btn.innerHTML = '&#9654;'; });
+
+  window.toggleRepfartherPlay = function() {
+    if (vid.paused) { vid.play(); } else { vid.pause(); }
+  };
+
+  window.scrubRepfarther = function(val) {
+    if (vid.duration) { vid.currentTime = (val / 1000) * vid.duration; }
+  };
+})();
+</script>
 
 <h3>Pair2Seq Promotes Contact Information</h3>
 
