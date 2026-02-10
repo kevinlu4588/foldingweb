@@ -325,7 +325,7 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
 </p>
 
 <figure class="center_image" style="margin-top: 30px">
-  <div class="video-widget" style="max-width: 800px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #000;">
+  <div class="video-widget" style="max-width: 1000px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #000;">
     <video id="disruption-video" muted playsinline preload="auto" style="width: 100%; display: block;">
       <source src="disruption.mp4" type="video/mp4">
       Your browser does not support the video tag.
@@ -335,7 +335,7 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
       <input id="disruption-scrubber" type="range" min="0" max="1000" value="0" step="1" style="flex: 1; cursor: pointer; accent-color: rgb(15, 103, 59);" oninput="scrubDisruption(this.value)">
       <span id="disruption-time" style="min-width: 70px; text-align: center; color: #555; font-size: 12px;">0:00 / 0:00</span>
       <label style="display: flex; align-items: center; gap: 4px; color: #555; font-size: 12px; margin: 0; cursor: pointer;" title="Loop playback">
-        <input id="disruption-loop" type="checkbox" checked onchange="document.getElementById('disruption-video').loop = this.checked" style="accent-color: rgb(15, 103, 59);"> Loop
+        <input id="disruption-loop" type="checkbox" onchange="document.getElementById('disruption-video').loop = this.checked" style="accent-color: rgb(15, 103, 59);"> Loop
       </label>
       <select id="disruption-speed" onchange="document.getElementById('disruption-video').playbackRate = parseFloat(this.value)" style="border: 1px solid #ccc; border-radius: 4px; padding: 2px 4px; font-size: 12px; background: #fff; cursor: pointer;">
         <option value="0.25">0.25x</option>
@@ -355,7 +355,7 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
   var btn = document.getElementById('disruption-play-btn');
   var scrubber = document.getElementById('disruption-scrubber');
   var timeDisplay = document.getElementById('disruption-time');
-  vid.loop = true;
+  vid.loop = false;
 
   function fmt(s) {
     var m = Math.floor(s / 60);
@@ -378,6 +378,65 @@ $$s_i' = s_i \pm \alpha \cdot v_{\text{charge}}$$
   };
 
   window.scrubDisruption = function(val) {
+    if (vid.duration) { vid.currentTime = (val / 1000) * vid.duration; }
+  };
+})();
+</script>
+
+<figure class="center_image" style="margin-top: 30px">
+  <div class="video-widget" style="max-width: 1000px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #000;">
+    <video id="attraction-video" muted playsinline preload="auto" style="width: 100%; display: block;">
+      <source src="attraction.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="video-controls" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8f8f8; border-top: 1px solid #ddd; font-size: 14px; font-family: 'Open Sans', sans-serif;">
+      <button id="attraction-play-btn" onclick="toggleAttractionPlay()" style="border: none; background: none; cursor: pointer; font-size: 18px; padding: 2px 6px; line-height: 1;" title="Play/Pause">&#9654;</button>
+      <input id="attraction-scrubber" type="range" min="0" max="1000" value="0" step="1" style="flex: 1; cursor: pointer; accent-color: rgb(15, 103, 59);" oninput="scrubAttraction(this.value)">
+      <span id="attraction-time" style="min-width: 70px; text-align: center; color: #555; font-size: 12px;">0:00 / 0:00</span>
+      <label style="display: flex; align-items: center; gap: 4px; color: #555; font-size: 12px; margin: 0; cursor: pointer;" title="Loop playback">
+        <input id="attraction-loop" type="checkbox" onchange="document.getElementById('attraction-video').loop = this.checked" style="accent-color: rgb(15, 103, 59);"> Loop
+      </label>
+      <select id="attraction-speed" onchange="document.getElementById('attraction-video').playbackRate = parseFloat(this.value)" style="border: 1px solid #ccc; border-radius: 4px; padding: 2px 4px; font-size: 12px; background: #fff; cursor: pointer;">
+        <option value="0.25">0.25x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+    </div>
+  </div>
+  <figcaption><strong>Charge attraction animation.</strong> Steering opposite charges toward each other decreases cross-strand distance, demonstrating electrostatic attraction. Use the controls to scrub through the animation or adjust playback speed.</figcaption>
+</figure>
+
+<script>
+(function() {
+  var vid = document.getElementById('attraction-video');
+  var btn = document.getElementById('attraction-play-btn');
+  var scrubber = document.getElementById('attraction-scrubber');
+  var timeDisplay = document.getElementById('attraction-time');
+  vid.loop = false;
+
+  function fmt(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  vid.addEventListener('timeupdate', function() {
+    if (vid.duration) {
+      scrubber.value = (vid.currentTime / vid.duration) * 1000;
+      timeDisplay.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration);
+    }
+  });
+
+  vid.addEventListener('play', function() { btn.innerHTML = '&#9646;&#9646;'; });
+  vid.addEventListener('pause', function() { btn.innerHTML = '&#9654;'; });
+
+  window.toggleAttractionPlay = function() {
+    if (vid.paused) { vid.play(); } else { vid.pause(); }
+  };
+
+  window.scrubAttraction = function(val) {
     if (vid.duration) { vid.currentTime = (val / 1000) * vid.duration; }
   };
 })();
