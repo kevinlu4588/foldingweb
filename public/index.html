@@ -7,7 +7,9 @@
 <meta property="og:title" content="Mechanisms of AI Protein Folding in ESMFold" />
 <meta property="og:description" content="Mechanistic interpretability analysis of how ESMFold predicts protein structure from sequence" />
 <meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary" /> 
+<meta property="og:image" content="https://folding.baulab.info/images/Folding.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://folding.baulab.info/images/Folding.png" />
 <meta name="twitter:title" content="Mechanisms of AI Protein Folding in ESMFold" />
 <meta name="twitter:description" content="Mechanistic interpretability analysis of how ESMFold predicts protein structure from sequence" />
 <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
@@ -241,7 +243,7 @@ Ever since AlphaFold showed that AI could predict protein structures with atomic
   </figure>
 
 <p>
-  In our experiments we study how the model folds a simple structural motif, the "beta hairpin", which consists of two strands that form a 180-degree fold, where residues before and after the turn join into antiparallel "beta strands" due to affinities between matching residues on either side.
+  In our experiments, we study how the model folds a simple structural motif: the beta hairpin. A beta hairpin consists of two strands that run in opposite directions, connected by a tight turn and held together by affinities between matching residues on either side of the fold.
 </p>
 
 
@@ -560,7 +562,7 @@ $$z'_{ij} = z_{ij} - \alpha \cdot \mathbf{w}$$
       </select>
     </div>
   </div>
-  <figcaption><strong>Distance repulsion: steering cross-strand residue pairs toward larger target distances breaking hairpin hydrogen bonds.</strong> We don't run this experiment in full for the paper, but it's a nice control experiment and visualization. </figcaption>
+  <figcaption><strong>Distance repulsion: steering cross-strand residue pairs toward larger target distances breaks hairpin hydrogen bonds.</strong> We don't run this experiment in full for the paper, but it's a nice control experiment and visualization. </figcaption>
 </figure>
 
 <script>
