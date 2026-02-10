@@ -48,13 +48,19 @@
   border-radius: 6px;
   background: #fafafa;
 }
-.related-work-entry .rw-thumb {
+.related-work-entry .rw-thumb-link {
   flex-shrink: 0;
+}
+.related-work-entry .rw-thumb {
   width: 120px;
   height: 80px;
   object-fit: cover;
   border-radius: 4px;
   border: 1px solid #ddd;
+  transition: opacity 0.15s;
+}
+.related-work-entry .rw-thumb:hover {
+  opacity: 0.8;
 }
 .related-work-entry .rw-info {
   flex: 1;
@@ -687,16 +693,16 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 <h4 class="related-work-section">Protein Structure Prediction</h4>
 
 <div id="ref-jumper2021" class="related-work-entry">
-  <img class="rw-thumb" src="images/related_work/alphafold2.png" alt="AlphaFold2">
+  <a class="rw-thumb-link" href="https://doi.org/10.1038/s41586-021-03819-2" target="_blank"><img class="rw-thumb" src="images/related_work/alphafold2.png" alt="AlphaFold2"></a>
   <div class="rw-info">
     <p class="rw-title"><a href="https://doi.org/10.1038/s41586-021-03819-2" target="_blank">Highly Accurate Protein Structure Prediction with AlphaFold</a></p>
-    <p class="rw-authors">John Jumper, Richard Evans, Alexander Pritzel, Tim Green, Michael Figurnov, Olaf Ronneberger, Kathryn Tunyasuvunakool, Russ Bates, Augustin Z&iacute;dek, Anna Potapenko, Alex Bridgland, Clemens Meyer, Simon A. A. Kohl, Andrew J. Ballard, Andrew Cowie, Bernardino Romera-Paredes, Stanislav Nikolov, Rishub Jain, Jonas Adler, Trevor Back, Stig Petersen, David Reiman, Ellen Clancy, Michal Zielinski, Martin Steinegger, Michalina Pacholska, Tamas Berghammer, Sebastian Bodenstein, David Silver, Oriol Vinyals, Andrew W. Senior, Koray Kavukcuoglu, Pushmeet Kohli, Demis Hassabis</p>
+    <p class="rw-authors">John Jumper, Richard Evans, Alexander Pritzel, Tim Green, Michael Figurnov, Olaf Ronneberger, Kathryn Tunyasuvunakool, Russ Bates, Augustin &#381;&iacute;dek, Anna Potapenko, Alex Bridgland, Clemens Meyer, Simon A. A. Kohl, Andrew J. Ballard, Andrew Cowie, Bernardino Romera-Paredes, Stanislav Nikolov, Rishub Jain, Jonas Adler, Trevor Back, Stig Petersen, David Reiman, Ellen Clancy, Michal Zielinski, Martin Steinegger, Michalina Pacholska, Tamas Berghammer, Sebastian Bodenstein, David Silver, Oriol Vinyals, Andrew W. Senior, Koray Kavukcuoglu, Pushmeet Kohli, Demis Hassabis</p>
     <p class="rw-venue">Nature, 596, 583&ndash;589, 2021</p>
   </div>
 </div>
 
 <div id="ref-lin2023" class="related-work-entry">
-  <img class="rw-thumb" src="images/related_work/esmfold.jpeg" alt="ESMFold">
+  <a class="rw-thumb-link" href="https://doi.org/10.1126/science.ade2574" target="_blank"><img class="rw-thumb" src="images/related_work/esmfold.jpeg" alt="ESMFold"></a>
   <div class="rw-info">
     <p class="rw-title"><a href="https://doi.org/10.1126/science.ade2574" target="_blank">Evolutionary-Scale Prediction of Atomic-Level Protein Structure with a Language Model</a></p>
     <p class="rw-authors">Zeming Lin, Halil Akin, Roshan Rao, Brian Hie, Zhongkai Zhu, Wenting Lu, Nikita Smetanin, Robert Verkuil, Ori Kabeli, Yaniv Shmueli, Allan dos Santos Costa, Maryam Fazel-Zarandi, Tom Sercu, Salvatore Candido, Alexander Rives</p>
@@ -705,7 +711,7 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 </div>
 
 <div id="ref-passaro2025" class="related-work-entry">
-  <img class="rw-thumb" src="images/related_work/boltz2.jpg" alt="Boltz-2">
+  <a class="rw-thumb-link" href="https://doi.org/10.1101/2025.06.14.659707" target="_blank"><img class="rw-thumb" src="images/related_work/boltz2.jpg" alt="Boltz-2"></a>
   <div class="rw-info">
     <p class="rw-title"><a href="https://doi.org/10.1101/2025.06.14.659707" target="_blank">Boltz-2: Towards Accurate and Efficient Binding Affinity Prediction</a></p>
     <p class="rw-authors">Saro Passaro, Gabriele Corso, Jeremy Wohlwend, Mateo Reveiz, Stephan Thaler, Vignesh Ram Somnath, Noah Getz, Tally Portnoi, Julien Roy, Hannes Stark, David Kwabi-Addo, Dominique Beaini, Tommi Jaakkola, Regina Barzilay</p>
@@ -716,7 +722,7 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 <h4 class="related-work-section">Mechanistic Interpretability</h4>
 
 <div id="ref-marks2024" class="related-work-entry">
-  <img class="rw-thumb" src="images/related_work/geometry_of_truth.png" alt="The Geometry of Truth">
+  <a class="rw-thumb-link" href="https://openreview.net/forum?id=aajyHYjjsk" target="_blank"><img class="rw-thumb" src="images/related_work/geometry_of_truth.png" alt="The Geometry of Truth"></a>
   <div class="rw-info">
     <p class="rw-title"><a href="https://openreview.net/forum?id=aajyHYjjsk" target="_blank">The Geometry of Truth: Emergent Linear Structure in Large Language Model Representations of True/False Datasets</a></p>
     <p class="rw-authors">Samuel Marks, Max Tegmark</p>
@@ -725,7 +731,7 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 </div>
 
 <div id="ref-meng2022" class="related-work-entry">
-  <img class="rw-thumb" src="images/related_work/locating_and_editing.png" alt="Locating and Editing Factual Associations">
+  <a class="rw-thumb-link" href="https://arxiv.org/abs/2202.05262" target="_blank"><img class="rw-thumb" src="images/related_work/locating_and_editing.png" alt="Locating and Editing Factual Associations"></a>
   <div class="rw-info">
     <p class="rw-title"><a href="https://arxiv.org/abs/2202.05262" target="_blank">Locating and Editing Factual Associations in GPT</a></p>
     <p class="rw-authors">Kevin Meng, David Bau, Alex Andonian, Yonatan Belinkov</p>
@@ -736,7 +742,7 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 <h4 class="related-work-section">Mechanistic Interpretability in Biology</h4>
 
 <div id="ref-vig2020" class="related-work-entry">
-  <img class="rw-thumb" src="images/related_work/bertology.png" alt="BERTology Meets Biology">
+  <a class="rw-thumb-link" href="https://arxiv.org/abs/2006.15222" target="_blank"><img class="rw-thumb" src="images/related_work/bertology.png" alt="BERTology Meets Biology"></a>
   <div class="rw-info">
     <p class="rw-title"><a href="https://arxiv.org/abs/2006.15222" target="_blank">BERTology Meets Biology: Interpreting Attention in Protein Language Models</a></p>
     <p class="rw-authors">Jesse Vig, Ali Madani, Lav R. Varshney, Caiming Xiong, Richard Socher, Nazneen Fatema Rajani</p>
@@ -745,7 +751,7 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 </div>
 
 <div id="ref-gujral2025" class="related-work-entry">
-  <img class="rw-thumb" src="images/related_work/sparse_autoencoders.png" alt="Sparse Autoencoders for Protein LMs">
+  <a class="rw-thumb-link" href="https://doi.org/10.1073/pnas.2506316122" target="_blank"><img class="rw-thumb" src="images/related_work/sparse_autoencoders.png" alt="Sparse Autoencoders for Protein LMs"></a>
   <div class="rw-info">
     <p class="rw-title"><a href="https://doi.org/10.1073/pnas.2506316122" target="_blank">Sparse Autoencoders Uncover Biologically Interpretable Features in Protein Language Model Representations</a></p>
     <p class="rw-authors">Onkar Gujral, Mihir Bafna, Eric J. Alm, Bonnie Berger</p>
@@ -756,7 +762,7 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 <h4 class="related-work-section">Protein Folding Biology</h4>
 
 <div id="ref-munoz1997" class="related-work-entry">
-  <img class="rw-thumb" src="images/related_work/folding_dynamics.png" alt="Folding Dynamics of Beta-Hairpin">
+  <a class="rw-thumb-link" href="https://doi.org/10.1038/36626" target="_blank"><img class="rw-thumb" src="images/related_work/folding_dynamics.png" alt="Folding Dynamics of Beta-Hairpin"></a>
   <div class="rw-info">
     <p class="rw-title"><a href="https://doi.org/10.1038/36626" target="_blank">Folding Dynamics and Mechanism of &beta;-Hairpin Formation</a></p>
     <p class="rw-authors">Victor Mu&ntilde;oz, Paul A. Thompson, James Hofrichter, William A. Eaton</p>
@@ -765,7 +771,7 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 </div>
 
 <div id="ref-dill2008" class="related-work-entry">
-  <img class="rw-thumb" src="images/related_work/protein_folding_problem.png" alt="The Protein Folding Problem">
+  <a class="rw-thumb-link" href="https://doi.org/10.1146/annurev.biophys.37.092707.153558" target="_blank"><img class="rw-thumb" src="images/related_work/protein_folding_problem.png" alt="The Protein Folding Problem"></a>
   <div class="rw-info">
     <p class="rw-title"><a href="https://doi.org/10.1146/annurev.biophys.37.092707.153558" target="_blank">The Protein Folding Problem</a></p>
     <p class="rw-authors">Ken A. Dill, S. Banu Ozkan, M. Scott Shell, Thomas R. Weikl</p>
