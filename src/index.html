@@ -1,17 +1,17 @@
 <!doctype html>
 <html lang="en">
 <head>
-<title>Mechanisms of AI Protein Folding in ESMFold</title>
+<title>Two Stages of Folding: Convergent Mechanisms in AI Protein Folding Trunks</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<meta name="description" content="Mechanistic interpretability analysis of how ESMFold predicts protein structure from sequence" />
-<meta property="og:title" content="Mechanisms of AI Protein Folding in ESMFold" />
-<meta property="og:description" content="Mechanistic interpretability analysis of how ESMFold predicts protein structure from sequence" />
+<meta name="description" content="Causal interventions on ESMFold, OpenFold, and Boltz-1 reveal a shared two-stage mechanism for mapping sequence chemistry into spatial geometry" />
+<meta property="og:title" content="Two Stages of Folding: Convergent Mechanisms in AI Protein Folding Trunks" />
+<meta property="og:description" content="Causal interventions on ESMFold, OpenFold, and Boltz-1 reveal a shared two-stage mechanism for mapping sequence chemistry into spatial geometry" />
 <meta property="og:type" content="website" />
 <meta property="og:image" content="https://folding.baulab.info/images/Folding.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://folding.baulab.info/images/Folding.png" />
-<meta name="twitter:title" content="Mechanisms of AI Protein Folding in ESMFold" />
-<meta name="twitter:description" content="Mechanistic interpretability analysis of how ESMFold predicts protein structure from sequence" />
+<meta name="twitter:title" content="Two Stages of Folding: Convergent Mechanisms in AI Protein Folding Trunks" />
+<meta name="twitter:description" content="Causal interventions on ESMFold, OpenFold, and Boltz-1 reveal a shared two-stage mechanism for mapping sequence chemistry into spatial geometry" />
 <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
@@ -178,7 +178,7 @@ gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
 <div class="nd-pageheader">
  <div class="container">
  <h1 class="lead">
- Mechanisms of AI Protein Folding in ESMFold
+ Two Stages of Folding: Convergent Mechanisms in AI Protein Folding Trunks
  </h1>
 <address>
   <nobr><a href="https://kevinlu4588.github.io/">Kevin Lu</a><sup>1</sup>,</nobr>
@@ -195,7 +195,7 @@ gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
   <nobr><sup>4</sup>Boston University,</nobr>
   <nobr><sup>5</sup>Technion</nobr>
 </address>
- <p style="margin-top: 8px; font-size: 1.1em;"><a href="https://www.gembio.ai/" target="_blank">ICLR 2026 GEM Bio Workshop</a></p>
+ <p style="margin-top: 8px; font-size: 1.1em;"><a href="https://neurips.cc/" target="_blank">The Thirty-Ninth Annual Conference on Neural Information Processing Systems (NeurIPS 2025)</a></p>
  </div>
 </div><!-- end nd-pageheader -->
  
@@ -212,7 +212,7 @@ gtag('js', new Date()); gtag('config', 'G-FD12LWN557');
 <div class="card-block">
 <h3>How Do AI Models Fold Proteins?</h3>
 <p>
-Ever since AlphaFold showed that AI could predict protein structures with atomic accuracy, scientists have asked: how does it actually work? We study this question by opening up ESMFold, a state-of-the-art protein folding model. Our work is the first mechanistic analysis of the folding trunk, the core engine that turns amino acid sequences into 3D structures. We find that the trunk operates in two distinct phases: first assembling a chemical picture of residue interactions, then building the geometric blueprint that determines the final fold. These internal representations are not just interpretable: they can be steered to change the predicted structure.
+Ever since AlphaFold showed that AI could predict protein structures with atomic accuracy, scientists have asked: how does it actually work? We study this question through causal interventions on the folding trunks of three models, ESMFold, OpenFold, and Boltz-1, the core engines that turn amino acid sequences into 3D structures. Across all three, we find a shared two-stage computation. In the first stage, early blocks initialize pairwise biochemical signals: features like charge propagate from sequence into pairwise representations through architecture-specific pathways. In the second stage, late blocks develop pairwise spatial features: distance and contact information accumulate in the pairwise representation. These representations are not just interpretable: steering charge and distance features induces predictable structural changes. They are also functionally interchangeable: pairwise states can be linearly aligned and substituted across models, suggesting that folding trunks with different architectures, inputs, and training procedures converge on a shared representational organization for mapping sequence chemistry into spatial geometry.
 </p>
 
 
@@ -695,6 +695,25 @@ The pair2seq pathway is one route by which $z$ influences the output. But $z$ al
 })();
 </script>
 
+<h2>Pairwise Representations Converge Across Folding Models</h2>
+
+<p>
+Do these mechanisms depend on the particular architecture of ESMFold, or do other folding trunks arrive at the same solution? We compare the pairwise representations of ESMFold, OpenFold, and Boltz-1, three models with different architectures, inputs, and training procedures.
+</p>
+
+  <figure class="center_image" style="margin-top: 30px">
+  <center><img src="images/paper/Figure8CrossModelAlignment.png" style="width:100%; max-width:900px"></center>
+  <figcaption><strong>Figure 8: Pairwise representations align across folding architectures and are functionally interchangeable.</strong> (a) CKA between pairwise representations at every block pair across ESMFold and OpenFold, and ESMFold and Boltz-1. (b) Test $R^2$ of whitened Procrustes projections from OpenFold and Boltz-1 pairwise representations into ESMFold's space, evaluated per block. Solid lines use true correspondences; dotted lines are shuffled-correspondence baselines. (c) Single-block pairwise patching success when donor representations come from OpenFold or Boltz-1 (after Procrustes projection into ESMFold's space) versus from ESMFold itself. Cross-model patching reproduces the late-block pairwise window, with strength tracking projection quality from (b).</figcaption>
+  </figure>
+
+<p>
+<strong>Representations align.</strong> Pairwise representations are highly similar across models throughout the middle and late blocks (Fig. 8a), and a simple linear map (whitened Procrustes) projects OpenFold and Boltz-1 pairwise states into ESMFold's space with high fidelity in late blocks (Fig. 8b).
+</p>
+
+<p>
+<strong>Representations are interchangeable.</strong> <span class="stage-late">Patching projected pairwise representations from OpenFold or Boltz-1 into ESMFold induces the target motif</span>, reproducing the same late-block pairwise window we observe with ESMFold's own representations (Fig. 8c). Despite their differences, these folding trunks converge on a shared representational organization for mapping sequence chemistry into spatial geometry.
+</p>
+
 <h2>Discussion</h2>
 
 
@@ -801,14 +820,14 @@ Protein folding models contain generalized knowledge that extends beyond their a
 <h3 class="card-header">bibliography</h3>
 <div class="card-block">
 <p style="text-indent: -3em; margin-left: 3em;" class="card-text clickselect">
-Lu, K., Brinkmann, J., Huber, S., Mueller, A., Belinkov, Y., Bau, D., &amp; Wendler, C. (2026). Mechanisms of AI Protein Folding in ESMFold. <em>arXiv preprint arXiv:2602.06020</em>.
+Lu, K., Brinkmann, J., Huber, S., Mueller, A., Belinkov, Y., Bau, D., &amp; Wendler, C. (2026). Two Stages of Folding: Convergent Mechanisms in AI Protein Folding Trunks. <em>arXiv preprint arXiv:2602.06020</em>.
 </p>
 </div>
 <h3 class="card-header">bibtex</h3>
 <div class="card-block">
 <pre class="card-text clickselect">
-@article{lu2026mechanisms,
-  title={Mechanisms of AI Protein Folding in ESMFold},
+@article{lu2026twostages,
+  title={Two Stages of Folding: Convergent Mechanisms in AI Protein Folding Trunks},
   author={Lu, Kevin and Brinkmann, Jannik and Huber, Stefan and Mueller, Aaron and Belinkov, Yonatan and Bau, David and Wendler, Chris},
   journal={arXiv preprint arXiv:2602.06020},
   year={2026}
